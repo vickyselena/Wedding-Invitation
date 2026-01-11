@@ -555,7 +555,12 @@
   </style>
 </head>
 <body>
-  <!-- Easy config (edit here) -->
+  <!-- =========================================================
+       EASY CONFIG (EDIT HERE)
+       - Cukup ubah nilai di window.INVITE_CONFIG di bawah ini.
+       - Untuk cover photo: media.coverBackground
+       - Untuk nama & tanggal: couple / event
+       ========================================================= -->
   <script>
     window.INVITE_CONFIG = {
       couple: {
@@ -577,7 +582,7 @@
         mapsUrl: "https://maps.google.com/?q=Monas"
       },
       media: {
-        couplePhoto: "", // (opsional) foto couple di dalam undangan. Contoh: "images/couple.jpg" atau URL
+        couplePhoto: "cover2.png", // (opsional) foto couple di dalam undangan. Contoh: "images/couple.jpg" atau URL
 
         // ===== COVER (WELCOME PAGE) BACKGROUND PORTRAIT =====
         // Isi DI SINI untuk mengganti foto background cover (portrait lebih bagus)
@@ -588,7 +593,7 @@
 
         // Anchor/focus gambar background. Default: "50% 12%" (top-center agak turun)
         // Tips: kalau wajah terlalu KE ATAS -> ubah jadi "50% 6%". Kalau terlalu KE BAWAH -> "50% 18%".
-        coverBackgroundPosition: "50% 12%",
+        coverBackgroundPosition: "50% 30%",
 
         // 0..1 agar teks tetap terbaca di atas foto (semakin besar semakin gelap)
         coverOverlayOpacity: 0.85,
@@ -618,6 +623,7 @@
     }
 
   </script>
+  <!-- ======================= EASY CONFIG END ======================= -->
 
   <noscript>
     <div style="max-width:600px;margin:12px auto;padding:14px;border-radius:12px;border:1px solid #e8e3d8;background:#fff;">
