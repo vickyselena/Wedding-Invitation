@@ -2,7 +2,9 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="description" content="Undangan pernikahan — kami menanti kehadiran dan doa terbaik Anda." />
   <meta name="theme-color" content="#df705f" />
 
@@ -20,8 +22,8 @@
 
   <style>
     * {margin: 0;padding: 0;box-sizing: border-box;-webkit-tap-highlight-color: transparent;}
-    html {height: 100%;font-size: 16px;-webkit-text-size-adjust: 100%;-ms-text-size-adjust: 100%; scroll-behavior: smooth;}
-    body {min-height: 100%;font-family: 'Poppins', sans-serif;background: #df705f;color: rgba(0,0,0,0.78);overflow-x: hidden;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;overscroll-behavior-y: none;}
+    html {height: 100%;font-size: 16px;-webkit-text-size-adjust: 100%;-ms-text-size-adjust: 100%; scroll-behavior: smooth;overscroll-behavior-y: none;}
+    body {min-height: 100%;font-family: 'Poppins', sans-serif;background: #df705f;color: rgba(0,0,0,0.78);overflow-x: hidden;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;overscroll-behavior-y: none;touch-action: pan-y;}
 
     /* ========== TOAST ========== */
     .toast {position: fixed;left: 50%;bottom: 16px;transform: translateX(-50%);z-index: 10000;opacity: 0;pointer-events: none;transition: opacity .25s ease, transform .25s ease;}
@@ -65,7 +67,7 @@
     /* Optional portrait background photo (welcome page) */
     .cover-page::before {content:'';position:absolute;inset:0;background-image: var(--cover-bg-image, none);background-size: cover;background-repeat: no-repeat;background-position: var(--cover-bg-pos, 50% 12%);transform: scale(1.02);filter: saturate(1.05) contrast(1.05);z-index: 0;opacity: var(--cover-bg-opacity, 1);}
     .cover-page::after {content:'';position:absolute;inset:0;background: linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.55) 100%);opacity: var(--cover-overlay-opacity, 0);z-index: 1;pointer-events:none;}
-    .cover-page {transform: translateZ(0); will-change: transform, opacity;}
+    .cover-page {transform: translateZ(0); will-change: transform, opacity;contain: layout paint;}
     .cover-page.hidden {opacity: 0;transform: scale(1.1) translateZ(0);pointer-events: none;}
     .cover-content {text-align: center;position: relative;z-index: 3;animation: fadeInUp 1.5s ease-out;padding: 0 20px;max-width: 100%;}
     .cover-bg-pattern {position: absolute;width: 100%;height: 100%;overflow: hidden;opacity: 0.10;z-index: 2;}
@@ -581,12 +583,12 @@
         // Isi DI SINI untuk mengganti foto background cover (portrait lebih bagus)
         // Contoh jika file ada di repo: "images/cover-portrait.jpg"
         // Contoh jika pakai URL: "https://domain.com/foto.jpg"
-        coverBackground: "cover2.png", // Google Drive (pastikan akses: Anyone with the link)
+        coverBackground: "https://drive.google.com/uc?export=view&id=11P_eds3Fa9n8aI-632KnB7JXSJNmX6gu", // Google Drive (pastikan akses: Anyone with the link)
 
 
         // Anchor/focus gambar background. Default: "50% 12%" (top-center agak turun)
         // Tips: kalau wajah terlalu KE ATAS -> ubah jadi "50% 6%". Kalau terlalu KE BAWAH -> "50% 18%".
-        coverBackgroundPosition: "50% 30%",
+        coverBackgroundPosition: "50% 12%",
 
         // 0..1 agar teks tetap terbaca di atas foto (semakin besar semakin gelap)
         coverOverlayOpacity: 0.85,
@@ -909,6 +911,39 @@
           }
         });
       }
+    }
+
+    // ========== iOS rubber-band / pull-to-refresh scaling fix ==========
+    // Efek "halaman mengecil lalu balik" umumnya berasal dari overscroll bounce iOS Safari.
+    // Kita cegah overscroll saat sudah mentok atas/bawah.
+    function initPreventRubberBand(){
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      if (!isIOS) return;
+
+      let startY = 0;
+      document.addEventListener('touchstart', (e) => {
+        if (!e.touches || !e.touches.length) return;
+        startY = e.touches[0].clientY;
+      }, { passive: true });
+
+      document.addEventListener('touchmove', (e) => {
+        // Jangan ganggu gesture di input/textarea/select
+        const t = e.target;
+        if (t && t.closest && t.closest('input, textarea, select')) return;
+
+        if (!e.touches || !e.touches.length) return;
+        const y = e.touches[0].clientY;
+        const dy = y - startY;
+
+        const se = document.scrollingElement || document.documentElement;
+        const atTop = se.scrollTop <= 0;
+        const atBottom = se.scrollTop + se.clientHeight >= se.scrollHeight - 1;
+
+        // dy>0 = tarik ke bawah, dy<0 = dorong ke atas
+        if ((atTop && dy > 0) || (atBottom && dy < 0)) {
+          e.preventDefault();
+        }
+      }, { passive: false });
     }
 
     function toast(msg){
@@ -1411,6 +1446,7 @@
     // Init
     document.addEventListener('DOMContentLoaded', function() {
       initStableViewport();
+      initPreventRubberBand();
       hydrate();
       startCountdown();
       initCoverOpen();
@@ -1422,4 +1458,3 @@
   </script>
 </body>
 </html>
-
