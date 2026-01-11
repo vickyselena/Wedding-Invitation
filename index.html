@@ -1,1 +1,1384 @@
-a
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Undangan pernikahan — kami menanti kehadiran dan doa terbaik Anda." />
+  <meta name="theme-color" content="#df705f" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Wedding Invitation" />
+  <meta property="og:description" content="Kami mengundang Anda untuk hadir di hari bahagia kami." />
+  <meta property="og:type" content="website" />
+
+  <title>Wedding Invitation</title>
+
+  <!-- Tailwind CDN (required) -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Italiana&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Spectral:ital,wght@0,300;0,400;0,500;1,300&family=Poppins:wght@200;300;400;500&family=Raleway:wght@200;300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    * {margin: 0;padding: 0;box-sizing: border-box;-webkit-tap-highlight-color: transparent;}
+    html {height: 100%;font-size: 16px;-webkit-text-size-adjust: 100%;-ms-text-size-adjust: 100%; scroll-behavior: smooth;}
+    body {min-height: 100%;font-family: 'Poppins', sans-serif;background: #df705f;color: rgba(0,0,0,0.78);overflow-x: hidden;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;}
+
+    /* ========== TOAST ========== */
+    .toast {position: fixed;left: 50%;bottom: 16px;transform: translateX(-50%);z-index: 10000;opacity: 0;pointer-events: none;transition: opacity .25s ease, transform .25s ease;}
+    .toast.show {opacity: 1;transform: translateX(-50%) translateY(-4px);}
+
+    /* ========== MUSIC PLAYER ========== */
+    .music-player {position: fixed;bottom: 30px;right: 30px;z-index: 9998;opacity: 0;transform: scale(0);transition: all 0.5s ease;}
+    .music-player.show {opacity: 1;transform: scale(1);}
+    .music-btn {width: 56px;height: 56px;background: linear-gradient(135deg, #8b7355 0%, #6d5940 100%);border: none;border-radius: 50%;cursor: pointer;box-shadow: 0 8px 25px rgba(139, 115, 85, 0.4);display: flex;align-items: center;justify-content: center;transition: all 0.3s ease;position: relative;overflow: hidden;-webkit-tap-highlight-color: transparent;touch-action: manipulation;}
+    .music-btn::before {content: '';position: absolute;width: 100%;height: 100%;background: rgba(255, 255, 255, 0.1);border-radius: 50%;animation: musicPulse 2s ease-out infinite;}
+    .music-btn:active {transform: scale(0.95);}
+    .music-btn svg {width: 24px;height: 24px;fill: white;position: relative;z-index: 1;}
+    .music-icon-play,.music-icon-pause {display: none;}
+    .music-btn.playing .music-icon-pause {display: block;}
+    .music-btn:not(.playing) .music-icon-play {display: block;}
+    @keyframes musicPulse {0% {transform: scale(1);opacity: 0.5;}50% {transform: scale(1.2);opacity: 0;}100% {transform: scale(1.4);opacity: 0;}}
+
+    /* ========== FULLSCREEN COVER PAGE ========== */
+    .cover-page {position: fixed;top: 0;left: 0;width: 100%;height: 100vh;height: 100svh;height: 100dvh;height: calc(var(--vh, 1vh) * 100);background: var(--bg-main);display: flex;align-items: center;justify-content: center;z-index: 9999;transition: opacity 1s ease-out, transform 1s ease-out;overflow: hidden;}
+    /* Optional portrait background photo (welcome page) */
+    .cover-page::before {content:'';position:absolute;inset:0;background-image: var(--cover-bg-image, none);background-size: cover;background-repeat: no-repeat;background-position: var(--cover-bg-pos, 50% 12%);transform: scale(1.02);filter: saturate(1.05) contrast(1.05);z-index: 0;opacity: var(--cover-bg-opacity, 1);}
+    .cover-page::after {content:'';position:absolute;inset:0;background: linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.55) 100%);opacity: var(--cover-overlay-opacity, 0);z-index: 1;pointer-events:none;}
+    .cover-page.hidden {opacity: 0;transform: scale(1.1);pointer-events: none;}
+    .cover-content {text-align: center;position: relative;z-index: 3;animation: fadeInUp 1.5s ease-out;padding: 0 20px;max-width: 100%;}
+    .cover-bg-pattern {position: absolute;width: 100%;height: 100%;overflow: hidden;opacity: 0.10;z-index: 2;}
+    #coverPage.has-cover-bg .cover-bg-pattern { opacity: 0.06; }
+    #coverPage.has-cover-bg .cover-particles { opacity: 0.75; }
+    .cover-circle {position: absolute;border-radius: 50%;border: 1px solid #8b7355;animation: expandCircle 20s ease-out infinite;}
+    .cover-circle:nth-child(1) {width: 200px;height: 200px;top: 50%;left: 50%;transform: translate(-50%, -50%);animation-delay: 0s;}
+    .cover-circle:nth-child(2) {width: 350px;height: 350px;top: 50%;left: 50%;transform: translate(-50%, -50%);animation-delay: 2s;}
+    .cover-circle:nth-child(3) {width: 500px;height: 500px;top: 50%;left: 50%;transform: translate(-50%, -50%);animation-delay: 4s;}
+    .cover-particles {position: absolute;width: 100%;height: 100%;pointer-events: none;z-index: 2;}
+    .cover-particle {position: absolute;background: rgba(255,255,255,0.75);border-radius: 50%;opacity: 0;animation: floatParticle 8s ease-in-out infinite;}
+    .cover-particle:nth-child(1) { width: 3px; height: 3px; left: 20%; animation-delay: 0s; }
+    .cover-particle:nth-child(2) { width: 4px; height: 4px; left: 40%; animation-delay: 1.5s; }
+    .cover-particle:nth-child(3) { width: 2px; height: 2px; left: 60%; animation-delay: 3s; }
+    .cover-particle:nth-child(4) { width: 3px; height: 3px; left: 80%; animation-delay: 4.5s; }
+    .cover-particle:nth-child(5) { width: 3px; height: 3px; left: 30%; animation-delay: 6s; }
+    .cover-particle:nth-child(6) { width: 4px; height: 4px; left: 70%; animation-delay: 2s; }
+    .cover-ornament {width: 100px;height: 100px;margin: 0 auto 20px;animation: rotateGlowCover 15s linear infinite;filter: drop-shadow(0 0 15px rgba(196, 181, 160, 0.3));}
+    .cover-label {font-family: 'Raleway', sans-serif;font-size: 0.75em;letter-spacing: 4px;color: #a39382;text-transform: uppercase;font-weight: 300;margin-bottom: 15px;animation: fadeIn 2s ease-out 0.5s backwards;}
+    .cover-title {font-family: 'Italiana', serif;font-size: 2.2em;font-weight: 400;color: #8b7355;margin: 15px 0 10px;letter-spacing: 2px;line-height: 1.3;animation: fadeInUp 1.5s ease-out 0.8s backwards;}
+    .cover-names {font-family: 'Playfair Display', serif;font-size: 2em;color: #6d5940;margin: 20px 0;font-weight: 400;letter-spacing: 1px;animation: fadeInUp 1.5s ease-out 1.2s backwards;line-height: 1.5;}
+    .cover-ampersand {font-family: 'Italiana', serif;font-size: 1.5em;color: #c4b5a0;display: block;margin: 10px 0;}
+    .cover-date {font-family: 'Poppins', sans-serif;font-size: 0.95em;color: #7a7a7a;font-weight: 300;letter-spacing: 2px;margin: 12px 0 32px;animation: fadeIn 1.5s ease-out 1.5s backwards;}
+
+    .cover-guest {font-family: 'Poppins', sans-serif;font-size: .85em;color: #7a7a7a;font-weight: 300;line-height: 1.6;margin: 6px auto 24px;max-width: 26rem;}
+    .cover-guest strong {font-weight: 400;color: #6d5940;}
+
+    .open-invitation-btn {display: inline-block;padding: 15px 45px;background: linear-gradient(135deg, #8b7355 0%, #6d5940 100%);color: white;text-decoration: none;border: none;border-radius: 50px;font-family: 'Raleway', sans-serif;font-size: 0.8em;letter-spacing: 2px;cursor: pointer;transition: all 0.4s ease;box-shadow: 0 8px 20px rgba(139, 115, 85, 0.3);position: relative;overflow: hidden;animation: fadeInUp 1.5s ease-out 1.8s backwards, pulse 2s ease-in-out 3s infinite;-webkit-tap-highlight-color: transparent;touch-action: manipulation;}
+    .open-invitation-btn::before {content: '';position: absolute;top: 50%;left: 50%;width: 0;height: 0;border-radius: 50%;background: rgba(255,255,255,0.3);transform: translate(-50%, -50%);transition: width 0.6s, height 0.6s;}
+    .open-invitation-btn:active::before {width: 300px;height: 300px;}
+    .open-invitation-btn:active {transform: translateY(-3px);box-shadow: 0 12px 30px rgba(139, 115, 85, 0.4);}
+    .open-invitation-btn span {position: relative;z-index: 1;}
+
+    .secondary-btn {display: inline-block;padding: 12px 35px;margin-top: 12px;background: rgba(255,255,255,0.6);color: #6d5940;text-decoration: none;border: 1px solid rgba(139,115,85,0.25);border-radius: 50px;font-family: 'Raleway', sans-serif;font-size: 0.78em;letter-spacing: 2px;cursor: pointer;transition: all 0.3s ease;box-shadow: 0 6px 18px rgba(0,0,0,0.06);backdrop-filter: blur(10px);touch-action: manipulation;}
+    .secondary-btn:active {transform: translateY(-2px);}
+
+    .scroll-hint {position: absolute;bottom: 30px;left: 50%;transform: translateX(-50%);animation: bounce 2s ease-in-out infinite;opacity: 0.5;z-index: 3;}
+    .scroll-hint svg {width: 25px;height: 25px;stroke: #8b7355;}
+
+    /* ========== MAIN CONTAINER ========== */
+    .container {max-width: 600px;width: 100%;margin: 0 auto;background: #ffffff;box-shadow: 0 10px 40px rgba(0,0,0,0.18);position: relative;opacity: 0;transform: translateY(50px);transition: opacity 1s ease-out 0.5s, transform 1s ease-out 0.5s;}
+    .container.visible {opacity: 1;transform: translateY(0);}
+    .bg-decoration {position: fixed;pointer-events: none;z-index: 0;opacity: 0.08;display: none;}
+
+    .corner-decoration {position: absolute;width: 80px;height: 80px;opacity: 0.15;z-index: 1;}
+    .corner-top-left {top: 0;left: 0;animation: fadeInRotate 2s ease-out;}
+    .corner-top-right {top: 0;right: 0;transform: scaleX(-1);animation: fadeInRotate 2s ease-out 0.3s;animation-fill-mode: backwards;}
+    .corner-bottom-left {bottom: 0;left: 0;transform: scaleY(-1);animation: fadeInRotate 2s ease-out 0.6s;animation-fill-mode: backwards;}
+    .corner-bottom-right {bottom: 0;right: 0;transform: scale(-1);animation: fadeInRotate 2s ease-out 0.9s;animation-fill-mode: backwards;}
+    .particles {position: absolute;width: 100%;height: 100%;overflow: hidden;pointer-events: none;z-index: 2;display: none;}
+    .particle {position: absolute;background: radial-gradient(circle, #c4b5a0 0%, transparent 70%);border-radius: 50%;opacity: 0;animation: particleFloat 15s infinite;}
+    .floral-decoration {position: absolute;opacity: 0.1;animation: float 8s ease-in-out infinite;width: 80px !important;}
+    .floral-left {left: -20px;top: 50%;transform: translateY(-50%);}
+    .floral-right {right: -20px;top: 50%;transform: translateY(-50%) scaleX(-1);animation-delay: 4s;}
+
+    /* Header Section */
+    .header {padding: 50px 20px 40px;text-align: center;background: transparent;position: relative;overflow: hidden;}
+    .header::before {content: '';position: absolute;top: -50%;left: -50%;width: 200%;height: 200%;background: radial-gradient(circle, rgba(196, 181, 160, 0.05) 0%, transparent 70%);animation: rotate 30s linear infinite;}
+    .ornament {width: 60px;height: 60px;margin: 0 auto 15px;animation: rotateGlow 20s linear infinite;position: relative;z-index: 1;}
+    .header p {font-family: 'Raleway', sans-serif;font-size: 0.75em;letter-spacing: 4px;color: #a39382;text-transform: uppercase;font-weight: 200;position: relative;z-index: 1;}
+    .header h1 {font-family: 'Italiana', serif;font-size: 2em;font-weight: 400;color: #8b7355;margin: 12px 0;letter-spacing: 2px;position: relative;z-index: 1;animation: fadeInUp 1.2s ease-out;}
+    .pattern-border {position: absolute;width: 100%;height: 2px;background: repeating-linear-gradient(90deg, #c4b5a0 0px, #c4b5a0 10px, transparent 10px, transparent 20px);opacity: 0.3;animation: slidePattern 20s linear infinite;}
+
+    /* Couple Section */
+    .couple {padding: 40px 20px;text-align: center;position: relative;}
+    .couple::before,.couple::after {content: '';position: absolute;width: 150px;height: 150px;border-radius: 50%;background: radial-gradient(circle, rgba(196, 181, 160, 0.05) 0%, transparent 70%);}
+    .couple::before {top: 20%;left: -75px;animation: pulse 6s ease-in-out infinite;}
+    .couple::after {bottom: 20%;right: -75px;animation: pulse 6s ease-in-out infinite 3s;}
+    .couple h2 {font-family: 'Spectral', serif;font-size: 1.5em;color: #8b7355;margin-bottom: 20px;font-weight: 400;position: relative;z-index: 1;}
+    .couple > p {font-family: 'Poppins', sans-serif;font-size: 0.85em;line-height: 1.8;color: #7a7a7a;font-weight: 300;position: relative;z-index: 1;padding: 0 10px;}
+    .divider {width: 60px;height: 1px;background: linear-gradient(90deg, transparent, #c4b5a0, transparent);margin: 25px auto;position: relative;animation: expandWidth 2s ease-out;}
+    .divider::before {content: '❋';position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);background: white;padding: 0 10px;color: #c4b5a0;font-size: 0.8em;animation: rotateSymbol 4s ease-in-out infinite;}
+    .names-container {margin: 30px 0;position: relative;z-index: 1;}
+    .names {font-family: 'Playfair Display', serif;font-size: 2em;color: #6d5940;margin: 15px 0;font-weight: 400;animation: fadeInUp 1s ease-out;letter-spacing: 1px;position: relative;word-wrap: break-word;}
+    .names::before {content: '';position: absolute;bottom: -5px;left: 50%;transform: translateX(-50%);width: 0;height: 2px;background: linear-gradient(90deg, transparent, #c4b5a0, transparent);animation: underlineExpand 2s ease-out 0.5s forwards;}
+    .ampersand {font-family: 'Italiana', serif;font-size: 2em;color: #c4b5a0;font-style: normal;margin: 12px 0;display: block;font-weight: 400;animation: scaleIn 1.5s ease-out;}
+
+    /* ========== WINDOW STYLE PHOTO FRAME (ARCH TOP) ========== */
+    /* Ukuran sedang (lebih proporsional) — tetap bentuk “jendela antik” */
+    .photo-frame {
+      width: 280px;
+      height: 360px;
+      margin: 35px auto;
+      border-radius: 140px 140px 12px 12px;
+      border: 5px solid #d4cfc4;
+      overflow: hidden;
+      box-shadow:
+        0 20px 50px rgba(139, 115, 85, 0.25),
+        0 10px 25px rgba(0,0,0,0.1),
+        inset 0 0 0 3px #f5f2ed,
+        inset 0 0 30px rgba(255,255,255,0.5);
+      position: relative;
+      background: linear-gradient(135deg, #f5f2ed 0%, #e8e3d8 100%);
+      transition: all 0.5s ease;
+      animation: fadeInScale 1.5s ease-out;
+    }
+    .photo-frame:hover {
+      transform: translateY(-12px) scale(1.02);
+      box-shadow:
+        0 35px 70px rgba(139, 115, 85, 0.35),
+        0 15px 35px rgba(0,0,0,0.15),
+        inset 0 0 0 3px #f5f2ed,
+        inset 0 0 30px rgba(255,255,255,0.5);
+    }
+    .photo-frame::before {
+      content: '';
+      position: absolute;
+      top: -12px;
+      left: -12px;
+      right: -12px;
+      bottom: -12px;
+      border: 2px solid #c4b5a0;
+      border-radius: 152px 152px 24px 24px;
+      opacity: 0.5;
+      pointer-events: none;
+      animation: pulse 4s ease-in-out infinite;
+    }
+    .photo-frame::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.6) 50%, transparent 70%);
+      animation: shimmer 4s infinite;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .photo-frame img {width: 100%;height: 100%;object-fit: cover;position: relative;z-index: 1;transition: transform 0.5s ease;display:none;}
+    .photo-frame.has-photo img {display:block;}
+    .photo-frame.has-photo .photo-placeholder {display:none;}
+    .photo-frame:hover img {transform: scale(1.08);}
+
+    .photo-frame .photo-overlay {position: absolute;top: 0;left: 0;right: 0;bottom: 0;background: linear-gradient(180deg,rgba(255,255,255,0.2) 0%,transparent 25%,transparent 75%,rgba(139, 115, 85, 0.15) 100%);z-index: 2;pointer-events: none;}
+    .photo-frame .corner-ornament {position: absolute;width: 20px;height: 20px;border: 2px solid #c4b5a0;z-index: 4;pointer-events: none;opacity: 0.6;}
+    .photo-frame .corner-ornament.top-left {top: 10px;left: 10px;border-right: none;border-bottom: none;border-radius: 5px 0 0 0;}
+    .photo-frame .corner-ornament.top-right {top: 10px;right: 10px;border-left: none;border-bottom: none;border-radius: 0 5px 0 0;}
+    .photo-frame .corner-ornament.bottom-left {bottom: 10px;left: 10px;border-right: none;border-top: none;border-radius: 0 0 0 5px;}
+    .photo-frame .corner-ornament.bottom-right {bottom: 10px;right: 10px;border-left: none;border-top: none;border-radius: 0 0 5px 0;}
+
+    .photo-placeholder {width: 100%;height: 100%;display: flex;flex-direction: column;align-items: center;justify-content: center;background: linear-gradient(180deg, #f0ebe5 0%, #e8e3d8 50%, #f0ebe5 100%);}
+    .photo-placeholder svg {width: 70px;height: 70px;fill: #c4b5a0;margin-bottom: 15px;opacity: 0.6;}
+    .photo-placeholder span {font-family: 'Poppins', sans-serif;font-size: 0.95em;color: #a39382;font-weight: 300;letter-spacing: 1px;}
+
+    /* Responsive Photo Frame */
+    @media (max-width: 350px) {
+      .photo-frame {width: 220px;height: 280px;border-radius: 110px 110px 10px 10px;border-width: 4px;}
+      .photo-frame::before {top: -10px;left: -10px;right: -10px;bottom: -10px;border-radius: 120px 120px 20px 20px;}
+      .photo-placeholder svg {width: 50px;height: 50px;}
+    }
+    @media (min-width: 351px) and (max-width: 450px) {
+      .photo-frame {width: 250px;height: 320px;border-radius: 125px 125px 10px 10px;}
+      .photo-frame::before {border-radius: 137px 137px 22px 22px;}
+    }
+    @media (min-width: 500px) {
+      .photo-frame {width: 300px;height: 385px;border-radius: 150px 150px 14px 14px;}
+      .photo-frame::before {border-radius: 162px 162px 26px 26px;}
+    }
+    @media (min-width: 768px) {
+      .photo-frame {width: 340px;height: 435px;border-radius: 170px 170px 16px 16px;}
+      .photo-frame::before {border-radius: 182px 182px 28px 28px;}
+    }
+    @media (min-width: 1025px) {
+      .photo-frame {width: 380px;height: 490px;border-radius: 190px 190px 18px 18px;border-width: 6px;}
+      .photo-frame::before {top: -14px;left: -14px;right: -14px;bottom: -14px;border-radius: 204px 204px 32px 32px;}
+      .photo-placeholder svg {width: 80px;height: 80px;}
+    }
+
+    .hearts-container {position: absolute;width: 100%;height: 100%;pointer-events: none;overflow: hidden;display: none;}
+    .heart {position: absolute;font-size: 16px;opacity: 0;color: #c4b5a0;animation: floatHeart 10s infinite;}
+
+    /* Date Section */
+    .date-section {padding: 40px 20px;background: rgba(255,255,255,0.92);text-align: center;position: relative;overflow: hidden;}
+    .date-section::before {content: '';position: absolute;top: 0;left: 0;width: 100%;height: 100%;background-image: radial-gradient(circle, #c4b5a0 1px, transparent 1px);background-size: 40px 40px;opacity: 0.03;animation: movePattern 20s linear infinite;}
+    .date-box {display: inline-block;padding: 30px 40px;border: 2px solid #e8e3d8;background: white;position: relative;box-shadow: 0 5px 15px rgba(0,0,0,0.05);z-index: 1;animation: fadeInScale 1.2s ease-out;max-width: 95%;}
+    .date-box::before,.date-box::after {content: '❀';position: absolute;color: #c4b5a0;font-size: 1.2em;opacity: 0.4;animation: pulse 3s ease-in-out infinite;}
+    .date-box::before {top: 8px;left: 12px;}
+    .date-box::after {bottom: 8px;right: 12px;animation-delay: 1.5s;}
+    .date-box .day {font-family: 'Playfair Display', serif;font-size: 1.8em;color: #8b7355;font-weight: 400;margin-bottom: 10px;letter-spacing: 1px;}
+    .date-box .details {font-family: 'Poppins', sans-serif;font-size: 0.85em;color: #7a7a7a;line-height: 1.8;font-weight: 300;}
+
+    /* Countdown */
+    .countdown {margin-top: 18px;display: grid;grid-template-columns: repeat(4, minmax(0,1fr));gap: 10px;}
+    .cd-item {border: 1px solid #e8e3d8;border-radius: 10px;padding: 10px 8px;background: #fafaf8;}
+    .cd-num {font-family: 'Playfair Display', serif;font-size: 1.4em;color: #6d5940;}
+    .cd-lbl {font-family: 'Raleway', sans-serif;font-size: 0.7em;letter-spacing: 2px;color: #a39382;text-transform: uppercase;margin-top: 4px;}
+
+    /* Decorative Section */
+    .decorative-section {padding: 50px 20px;text-align: center;background: rgba(255,255,255,0.92);position: relative;overflow: hidden;}
+    .decorative-section::before,.decorative-section::after {content: '';position: absolute;width: 120px;height: 120px;border-radius: 50%;background: radial-gradient(circle, rgba(196, 181, 160, 0.08) 0%, transparent 70%);}
+    .decorative-section::before {top: 10%;left: -40px;animation: pulse 5s ease-in-out infinite;}
+    .decorative-section::after {bottom: 10%;right: -40px;animation: pulse 5s ease-in-out infinite 2.5s;}
+    .large-ornament {width: 120px;height: 120px;margin: 0 auto 25px;animation: rotateGlow 20s linear infinite;position: relative;z-index: 1;}
+    .decorative-text {font-family: 'Playfair Display', serif;font-size: 1.6em;color: #8b7355;letter-spacing: 4px;font-weight: 400;position: relative;z-index: 1;margin-bottom: 15px;}
+    .decorative-subtext {font-family: 'Poppins', sans-serif;font-size: 0.85em;color: #a39382;font-weight: 300;letter-spacing: 2px;text-transform: uppercase;position: relative;z-index: 1;}
+    .decorative-line {width: 180px;max-width: 80%;height: 1px;background: linear-gradient(90deg, transparent, #c4b5a0, transparent);margin: 25px auto 0;position: relative;z-index: 1;}
+    .decorative-dots {display: flex;justify-content: center;gap: 12px;margin-top: 25px;position: relative;z-index: 1;}
+    .decorative-dots span {width: 6px;height: 6px;background: #c4b5a0;border-radius: 50%;opacity: 0.5;animation: dotPulse 2s ease-in-out infinite;}
+    .decorative-dots span:nth-child(1) { animation-delay: 0s; }
+    .decorative-dots span:nth-child(2) { animation-delay: 0.3s; }
+    .decorative-dots span:nth-child(3) { animation-delay: 0.6s; }
+
+    /* Location */
+    .location {padding: 40px 20px;text-align: center;position: relative;background: rgba(255,255,255,0.92);}
+    .location::before,.location::after {content: '';position: absolute;width: 80px;height: 80px;border-radius: 50%;background: radial-gradient(circle, rgba(196, 181, 160, 0.08) 0%, transparent 70%);}
+    .location::before {top: 10%;left: 5%;animation: pulse 5s ease-in-out infinite;}
+    .location::after {bottom: 10%;right: 5%;animation: pulse 5s ease-in-out infinite 2.5s;}
+    .location h3 {font-family: 'Spectral', serif;font-size: 1.6em;color: #8b7355;margin-bottom: 20px;font-weight: 400;position: relative;z-index: 1;}
+    .location p {font-family: 'Poppins', sans-serif;line-height: 2;color: #7a7a7a;margin-bottom: 25px;font-weight: 300;font-size: 0.9em;position: relative;z-index: 1;padding: 0 10px;}
+    .location p strong {font-family: 'Raleway', sans-serif;font-size: 1.1em;color: #6d5940;font-weight: 400;}
+    .map-btn {display: inline-block;padding: 12px 35px;background: linear-gradient(135deg, #8b7355 0%, #6d5940 100%);color: white;text-decoration: none;border-radius: 30px;font-family: 'Raleway', sans-serif;font-size: 0.8em;letter-spacing: 2px;transition: all 0.4s;box-shadow: 0 5px 15px rgba(139, 115, 85, 0.2);font-weight: 300;position: relative;z-index: 1;overflow: hidden;-webkit-tap-highlight-color: transparent;touch-action: manipulation;}
+    .map-btn::before {content: '';position: absolute;top: 50%;left: 50%;width: 0;height: 0;border-radius: 50%;background: rgba(255,255,255,0.2);transform: translate(-50%, -50%);transition: width 0.6s, height 0.6s;}
+    .map-btn:active::before {width: 300px;height: 300px;}
+    .map-btn:active {transform: translateY(-2px);box-shadow: 0 8px 25px rgba(139, 115, 85, 0.35);}
+
+    .map-embed {margin-top: 18px;border: 2px solid #e8e3d8;border-radius: 12px;overflow: hidden;box-shadow: 0 8px 25px rgba(0,0,0,0.06);position: relative;z-index: 1;}
+    .map-embed iframe {width: 100%;height: 280px;border: 0;display:block;}
+
+    .location-actions {display:flex;flex-wrap:wrap;gap: 10px;justify-content:center;}
+
+    /* RSVP */
+    .rsvp {padding: 40px 20px;background: white;text-align: center;position: relative;}
+    .rsvp::before {content: '';position: absolute;width: 250px;height: 250px;border-radius: 50%;background: radial-gradient(circle, rgba(196, 181, 160, 0.05) 0%, transparent 70%);top: 50%;left: 50%;transform: translate(-50%, -50%);animation: pulse 8s ease-in-out infinite;}
+    .rsvp h3 {font-family: 'Spectral', serif;font-size: 1.6em;color: #8b7355;margin-bottom: 30px;font-weight: 400;position: relative;z-index: 1;}
+    .rsvp-form {max-width: 100%;padding: 0 10px;margin: 0 auto;position: relative;z-index: 1;}
+    .rsvp-form input,.rsvp-form select,.rsvp-form textarea {width: 100%;padding: 14px 18px;margin-bottom: 15px;border: 2px solid #e8e3d8;border-radius: 8px;font-family: 'Poppins', sans-serif;font-size: 0.9em;transition: all 0.3s;background: #fafaf8;font-weight: 300;-webkit-appearance: none;-moz-appearance: none;appearance: none;}
+    .rsvp-form select {background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b7355' d='M6 9L1 4h10z'/%3E%3C/svg%3E");background-repeat: no-repeat;background-position: right 15px center;padding-right: 40px;}
+    .rsvp-form input:focus,.rsvp-form select:focus,.rsvp-form textarea:focus {outline: none;border-color: #c4b5a0;background: white;transform: translateY(-1px);box-shadow: 0 4px 12px rgba(196, 181, 160, 0.15);}
+    .rsvp-form textarea {resize: vertical;min-height: 90px;}
+    .rsvp-form button {width: 100%;padding: 14px;background: linear-gradient(135deg, #8b7355 0%, #6d5940 100%);color: white;border: none;border-radius: 30px;font-family: 'Raleway', sans-serif;font-size: 0.85em;letter-spacing: 2px;cursor: pointer;transition: all 0.4s;box-shadow: 0 5px 15px rgba(139, 115, 85, 0.2);font-weight: 300;position: relative;overflow: hidden;-webkit-tap-highlight-color: transparent;touch-action: manipulation;}
+    .rsvp-form button::before {content: '';position: absolute;top: 50%;left: 50%;width: 0;height: 0;border-radius: 50%;background: rgba(255,255,255,0.2);transform: translate(-50%, -50%);transition: width 0.6s, height 0.6s;}
+    .rsvp-form button:active::before {width: 400px;height: 400px;}
+    .rsvp-form button:active {transform: translateY(-2px);box-shadow: 0 8px 25px rgba(139, 115, 85, 0.35);}
+
+    .rsvp-note {margin: 12px auto 0;max-width: 420px;padding: 12px 14px;border-radius: 10px;border: 1px solid rgba(139,115,85,0.18);background: rgba(139,115,85,0.06);color: #6d5940;font-size: 0.85em;line-height: 1.6;display:none;position: relative;z-index: 1;}
+
+    .rsvp-list {margin: 18px auto 0;max-width: 460px;text-align:left;position: relative;z-index: 1;}
+    .rsvp-list h4 {font-family:'Raleway', sans-serif;font-size: 0.75em;letter-spacing: 3px;text-transform: uppercase;color:#a39382;margin: 10px 0;}
+    .rsvp-item {border: 1px solid #e8e3d8;background: #fafaf8;border-radius: 12px;padding: 12px 14px;margin-bottom: 10px;}
+    .rsvp-item .top {display:flex;align-items:flex-start;justify-content: space-between;gap: 10px;}
+    .rsvp-item .name {font-weight: 400;color:#6d5940;}
+    .rsvp-item .meta {font-size: .75em;color:#9a948b;margin-top: 2px;}
+    .rsvp-item .badge {font-size: .7em;letter-spacing: 1px;text-transform: uppercase;border-radius: 999px;padding: 6px 10px;white-space: nowrap;}
+    .badge-hadir {background: rgba(46, 204, 113, .12);border: 1px solid rgba(46, 204, 113, .25);color: #1f7a44;}
+    .badge-tidak {background: rgba(231, 76, 60, .10);border: 1px solid rgba(231, 76, 60, .20);color: #9b2c23;}
+    .badge-ragu {background: rgba(243, 156, 18, .10);border: 1px solid rgba(243, 156, 18, .20);color: #8b5a00;}
+    .rsvp-item .msg {margin-top: 8px;font-size: .9em;color:#6b6b6b;line-height: 1.6;}
+
+    /* Gift Section */
+    .gift-section {padding: 60px 20px;text-align: center;background: white;position: relative;}
+    .gift-section::before {content: '';position: absolute;width: 200px;height: 200px;border-radius: 50%;background: radial-gradient(circle, rgba(196, 181, 160, 0.05) 0%, transparent 70%);top: 50%;left: 50%;transform: translate(-50%, -50%);animation: pulse 8s ease-in-out infinite;}
+    .gift-section h3 {font-family: 'Spectral', serif;font-size: 1.6em;color: #8b7355;margin-bottom: 20px;font-weight: 400;position: relative;z-index: 1;}
+    .gift-section > p {font-family: 'Poppins', sans-serif;font-size: 0.9em;color: #7a7a7a;margin-bottom: 40px;line-height: 1.8;font-weight: 300;position: relative;z-index: 1;padding: 0 15px;}
+    .cards-container {display: flex;flex-direction: column;gap: 25px;max-width: 450px;margin: 0 auto;position: relative;z-index: 1;}
+    .atm-card {background: linear-gradient(135deg, #003d7a 0%, #0056b3 100%);border-radius: 15px;padding: 25px;box-shadow: 0 10px 30px rgba(0, 61, 122, 0.3);position: relative;overflow: hidden;transition: all 0.4s ease;animation: fadeInUp 0.8s ease-out;}
+    .atm-card:hover {transform: translateY(-5px);box-shadow: 0 15px 40px rgba(0, 61, 122, 0.4);}
+    .atm-card::before {content: '';position: absolute;top: -50%;right: -50%;width: 200%;height: 200%;background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);animation: shimmer 3s infinite;}
+    .card-header {display: flex;justify-content: space-between;align-items: flex-start;margin-bottom: 30px;}
+    .card-bank {color: white;font-family: 'Raleway', sans-serif;font-size: 1.4em;font-weight: 600;letter-spacing: 1px;}
+    .card-chip {width: 45px;height: 35px;background: linear-gradient(135deg, #f4c430 0%, #daa520 100%);border-radius: 6px;position: relative;overflow: hidden;}
+    .card-chip::before {content: '';position: absolute;top: 5px;left: 5px;right: 5px;bottom: 5px;background: repeating-linear-gradient(90deg, rgba(0,0,0,0.1), rgba(0,0,0,0.1) 2px, transparent 2px, transparent 4px);}
+    .card-number {color: white;font-family: 'Courier New', monospace;font-size: 1.3em;letter-spacing: 3px;margin: 20px 0;font-weight: 500;text-shadow: 0 2px 4px rgba(0,0,0,0.2);}
+    .card-details {display: flex;justify-content: space-between;align-items: flex-end;}
+    .card-holder {flex: 1;}
+    .card-label {font-family: 'Poppins', sans-serif;font-size: 0.65em;color: rgba(255,255,255,0.7);text-transform: uppercase;letter-spacing: 1px;margin-bottom: 5px;}
+    .card-name {color: white;font-family: 'Raleway', sans-serif;font-size: 0.95em;font-weight: 500;letter-spacing: 1px;text-transform: uppercase;}
+    .card-logo {width: 60px;height: auto;}
+    .copy-button {width: 100%;padding: 12px;margin-top: 15px;background: rgba(255, 255, 255, 0.15);backdrop-filter: blur(10px);color: white;border: 1px solid rgba(255, 255, 255, 0.3);border-radius: 8px;font-family: 'Raleway', sans-serif;font-size: 0.85em;letter-spacing: 1px;cursor: pointer;transition: all 0.3s ease;display: flex;align-items: center;justify-content: center;gap: 8px;touch-action: manipulation;}
+    .copy-button:hover {background: rgba(255, 255, 255, 0.25);border-color: rgba(255, 255, 255, 0.5);}
+    .copy-button:active {transform: scale(0.98);}
+    .copy-button.copied {background: rgba(46, 204, 113, 0.3);border-color: rgba(46, 204, 113, 0.6);}
+    .copy-icon {width: 16px;height: 16px;fill: white;}
+    .gift-note {margin-top: 30px;padding: 20px;background: #f9f8f4;border-radius: 10px;max-width: 450px;margin-left: auto;margin-right: auto;position: relative;z-index: 1;}
+    .gift-note p {font-family: 'Poppins', sans-serif;font-size: 0.85em;color: #7a7a7a;line-height: 1.7;font-weight: 300;font-style: italic;}
+    @media (max-width: 400px) {.atm-card {padding: 20px;}.card-number {font-size: 1.1em;letter-spacing: 2px;}.card-bank {font-size: 1.2em;}}
+
+    /* Footer */
+    .footer {padding: 40px 20px;text-align: center;background: transparent;position: relative;}
+    .footer::before {content: '';position: absolute;top: 0;left: 0;width: 100%;height: 1px;background: linear-gradient(90deg, transparent, #c4b5a0, transparent);animation: shimmerLine 3s ease-in-out infinite;}
+    .footer .quote {font-family: 'Spectral', serif;font-size: 1em;color: #6d5940;font-style: italic;line-height: 1.8;max-width: 100%;margin: 25px auto;font-weight: 300;padding: 0 15px;}
+    .footer .reference {font-family: 'Raleway', serif;color: #8b7355;font-weight: 400;margin-top: 12px;letter-spacing: 0.5px;font-size: 0.9em;}
+    .footer .closing {font-family: 'Poppins', sans-serif;margin-top: 25px;font-size: 0.9em;color: #a39382;font-weight: 300;}
+
+    /* ========== ANIMATIONS ========== */
+    @keyframes expandCircle {0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.3; }50% { opacity: 0.5; }100% { transform: translate(-50%, -50%) scale(1.2); opacity: 0; }}
+    @keyframes floatParticle {0% { bottom: -10px; opacity: 0; }10% { opacity: 0.6; }90% { opacity: 0.6; }100% { bottom: 100vh; opacity: 0; }}
+    @keyframes rotateGlowCover {0%, 100% { transform: rotate(0deg); filter: drop-shadow(0 0 15px rgba(196, 181, 160, 0.3)); }50% { transform: rotate(180deg); filter: drop-shadow(0 0 20px rgba(196, 181, 160, 0.5)); }}
+    @keyframes bounce {0%, 100% { transform: translateX(-50%) translateY(0); }50% { transform: translateX(-50%) translateY(-8px); }}
+    @keyframes float {0%, 100% { transform: translateY(0px) translateX(0px); }25% { transform: translateY(-15px) translateX(8px); }50% { transform: translateY(-8px) translateX(-4px); }75% { transform: translateY(-18px) translateX(4px); }}
+    @keyframes rotate {from { transform: rotate(0deg); }to { transform: rotate(360deg); }}
+    @keyframes rotateGlow {0%, 100% { transform: rotate(0deg); filter: drop-shadow(0 0 4px rgba(196, 181, 160, 0.3)); }50% { transform: rotate(180deg); filter: drop-shadow(0 0 8px rgba(196, 181, 160, 0.5)); }}
+    @keyframes fadeIn {from { opacity: 0; }to { opacity: 1; }}
+    @keyframes fadeInUp {from { opacity: 0; transform: translateY(20px); }to { opacity: 1; transform: translateY(0); }}
+    @keyframes fadeInScale {from { opacity: 0; transform: scale(0.8); }to { opacity: 1; transform: scale(1); }}
+    @keyframes fadeInRotate {from { opacity: 0; transform: rotate(-90deg) scale(0.5); }to { opacity: 0.15; transform: rotate(0deg) scale(1); }}
+    @keyframes pulse {0%, 100% { transform: scale(1); opacity: 0.5; }50% { transform: scale(1.1); opacity: 0.8; }}
+    @keyframes shimmer {0% { transform: translateX(-100%) translateY(-100%); }100% { transform: translateX(100%) translateY(100%); }}
+    @keyframes particleFloat {0% { bottom: -10px; opacity: 0; }10% { opacity: 0.5; }90% { opacity: 0.5; }100% { bottom: 110%; opacity: 0; }}
+    @keyframes floatHeart {0% { bottom: -30px; opacity: 0; transform: translateX(0) scale(0); }20% { opacity: 0.8; transform: translateX(8px) scale(1); }80% { opacity: 0.8; }100% { bottom: 110%; opacity: 0; transform: translateX(-15px) scale(0.5); }}
+    @keyframes expandWidth {from { width: 0; }to { width: 60px; }}
+    @keyframes underlineExpand {from { width: 0; }to { width: 80%; }}
+    @keyframes scaleIn {from { transform: scale(0); opacity: 0; }to { transform: scale(1); opacity: 1; }}
+    @keyframes rotateSymbol {0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }50% { transform: translate(-50%, -50%) rotate(180deg); }}
+    @keyframes slidePattern {from { background-position: 0 0; }to { background-position: 50px 50px; }}
+    @keyframes movePattern {from { background-position: 0 0; }to { background-position: 40px 40px; }}
+    @keyframes shimmerLine {0%, 100% { opacity: 0.3; }50% { opacity: 1; }}
+    @keyframes dotPulse {0%, 100% { opacity: 0.3; transform: scale(1); }50% { opacity: 1; transform: scale(1.3); }}
+
+    /* ========== COLOR THEME OVERRIDES ========== */
+    :root {
+      --vh: 1vh; /* stable viewport unit (JS will set px). Helps stop mobile address-bar jitter */
+      --bg-main: #df705f;
+      --text-main: rgba(255,255,255,0.96);
+      --text-muted: rgba(255,255,255,0.84);
+      --text-soft: rgba(255,255,255,0.68);
+
+      /* glass surface for cards/inputs on coral background */
+      --glass: rgba(255,255,255,0.14);
+      --glass-strong: rgba(255,255,255,0.18);
+      --stroke: rgba(255,255,255,0.28);
+      --stroke-soft: rgba(255,255,255,0.18);
+
+      /* cover background portrait photo (optional) */
+      --cover-bg-image: none; /* set via JS to url(...) */
+      --cover-bg-pos: 50% 12%; /* anchor/focus: top-center */
+      --cover-overlay-opacity: 0;
+      --cover-bg-opacity: 1;
+    }
+
+    body { background: var(--bg-main); color: var(--text-main); }
+
+    /* Isi undangan: gunakan background utama juga */
+    .container { background: var(--bg-main); border: 1px solid rgba(255,255,255,0.12); }
+    .header, .couple, .date-section, .decorative-section, .location, .rsvp, .gift-section, .footer { background: transparent; }
+
+    /* Font putih (utama) */
+    .header p, .header h1,
+    .couple h2, .couple > p,
+    .names,
+    .date-box .day, .date-box .details,
+    .cd-num, .cd-lbl,
+    .decorative-text, .decorative-subtext,
+    .location h3, .location p, .location p strong,
+    .rsvp h3, .gift-section h3, .gift-section > p,
+    .footer .quote, .footer .reference, .footer .closing,
+    .rsvp-note,
+    .rsvp-list h4,
+    .rsvp-item .name, .rsvp-item .msg, .rsvp-item .meta,
+    .gift-note p { color: var(--text-main); }
+
+    .rsvp-item .meta { opacity: .86; }
+    .cd-lbl { opacity: .90; }
+
+    .rsvp-form input, .rsvp-form select, .rsvp-form textarea { color: var(--text-main); }
+    .rsvp-form input::placeholder, .rsvp-form textarea::placeholder { color: var(--text-soft); }
+
+    /* Cover juga */
+    .cover-title, .cover-names, .cover-guest strong { color: var(--text-main); }
+    .cover-label, .cover-date, .cover-guest { color: var(--text-muted); }
+    .cover-ampersand { color: var(--text-main); }
+    .cover-guest code { color: var(--text-main); background: rgba(0,0,0,0.18); padding: 2px 6px; border-radius: 8px; }
+
+    /* If cover uses photo background, add a tiny shadow for readability */
+    #coverPage.has-cover-bg .cover-title,
+    #coverPage.has-cover-bg .cover-names,
+    #coverPage.has-cover-bg .cover-label,
+    #coverPage.has-cover-bg .cover-date,
+    #coverPage.has-cover-bg .cover-guest {
+      text-shadow: 0 2px 12px rgba(0,0,0,0.35);
+    }
+
+    /* Divider simbol: sesuaikan dengan background coral */
+    .divider::before { background: var(--bg-main); }
+
+    /* ===== Glass overrides so white text stays readable ===== */
+    .date-box {
+      background: var(--glass);
+      border-color: var(--stroke);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.14);
+      backdrop-filter: blur(10px);
+    }
+    .date-box::before, .date-box::after { color: rgba(255,255,255,0.70); }
+
+    /* Countdown boxes: background coral + white text */
+    .cd-item {
+      background: var(--bg-main);
+      border: 1px solid rgba(255,255,255,0.35);
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.06);
+    }
+    .cd-num, .cd-lbl { color: var(--text-main); }
+
+    .map-embed { border-color: var(--stroke); background: var(--glass); }
+
+    .rsvp, .gift-section { background: transparent; }
+    .rsvp-note {
+      background: var(--glass);
+      border-color: var(--stroke);
+      color: var(--text-main);
+      backdrop-filter: blur(10px);
+    }
+
+    .rsvp-form input,
+    .rsvp-form select,
+    .rsvp-form textarea {
+      background: var(--glass);
+      border-color: var(--stroke);
+      color: var(--text-main);
+    }
+    .rsvp-form input::placeholder,
+    .rsvp-form textarea::placeholder { color: var(--text-soft); }
+    .rsvp-form select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    }
+    .rsvp-form input:focus,
+    .rsvp-form select:focus,
+    .rsvp-form textarea:focus {
+      border-color: rgba(255,255,255,0.55);
+      background: var(--glass-strong);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.16);
+    }
+
+    .rsvp-item {
+      background: var(--glass);
+      border-color: var(--stroke);
+      backdrop-filter: blur(10px);
+    }
+    .rsvp-item .name, .rsvp-item .msg, .rsvp-item .meta { color: var(--text-main); }
+
+    /* Badge text forced white */
+    .badge-hadir, .badge-tidak, .badge-ragu { color: rgba(255,255,255,0.98); }
+
+    .gift-note {
+      background: var(--glass);
+      border: 1px solid var(--stroke-soft);
+      backdrop-filter: blur(10px);
+    }
+    .gift-note p { color: var(--text-main); }
+
+    .secondary-btn {
+      background: rgba(255,255,255,0.16);
+      border-color: var(--stroke-soft);
+      color: var(--text-main);
+    }
+
+    .fade-in-section {opacity: 0;transform: translateY(20px);transition: opacity 0.8s ease-out, transform 0.8s ease-out;}
+    .fade-in-section.is-visible {opacity: 1;transform: translateY(0);}
+
+    /* Desktop Responsive */
+    @media (min-width: 601px) and (max-width: 1024px) {.bg-decoration, .particles, .hearts-container { display: block; }}
+    @media (min-width: 1025px) {
+      .cover-title { font-size: 4em; }
+      .cover-names { font-size: 3.5em; }
+      .cover-ornament { width: 120px; height: 120px; }
+      .header h1 { font-size: 3.2em; }
+      .names { font-size: 2.8em; }
+      .large-ornament { width: 150px; height: 150px; }
+      .decorative-text { font-size: 2em; }
+      .bg-decoration, .particles, .hearts-container { display: block; }
+      .floral-decoration { width: 150px !important; }
+      .corner-decoration { width: 120px; height: 120px; opacity: 0.2; }
+      .open-invitation-btn:hover::before { width: 400px; height: 400px; }
+      .open-invitation-btn:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(139, 115, 85, 0.4); }
+      .map-btn:hover::before { width: 300px; height: 300px; }
+      .map-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(139, 115, 85, 0.35); }
+      .rsvp-form button:hover::before { width: 400px; height: 400px; }
+      .rsvp-form button:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(139, 115, 85, 0.35); }
+    }
+
+    /* Mobile perf (iOS Safari): backdrop-filter kadang bikin scroll "goyang"/jitter */
+    @media (max-width: 640px) {
+      .date-box, .rsvp-note, .rsvp-item, .gift-note, .map-embed,
+      .rsvp-form input, .rsvp-form select, .rsvp-form textarea,
+      .secondary-btn, .copy-button {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+      }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Easy config (edit here) -->
+  <script>
+    window.INVITE_CONFIG = {
+      couple: {
+        brideShort: "SELENA",
+        groomShort: "VICKY",
+        brideInitial: "S",
+        groomInitial: "V",
+        brideFull: "SELENA DIAN",
+        groomFull: "VICKY NANDA AGUSTI"
+      },
+      event: {
+        dateISO: "2026-02-07T14:00:00+07:00",
+        dateShort: "07 • 02 • 2026",
+        dayName: "Sabtu",
+        dateLong: "07 Februari 2026",
+        time: "Pukul 14.00 WIB - Selesai",
+        venueName: "Gedung Pernikahan",
+        venueAddressHtml: "Jl. Contoh No. 123<br>Jakarta Selatan, DKI Jakarta",
+        mapsUrl: "https://maps.google.com/?q=Monas"
+      },
+      media: {
+        couplePhoto: "", // (opsional) foto couple di dalam undangan. Contoh: "images/couple.jpg" atau URL
+
+        // ===== COVER (WELCOME PAGE) BACKGROUND PORTRAIT =====
+        // Isi DI SINI untuk mengganti foto background cover (portrait lebih bagus)
+        // Contoh jika file ada di repo: "images/cover-portrait.jpg"
+        // Contoh jika pakai URL: "https://domain.com/foto.jpg"
+        coverBackground: "cover2.png", // Google Drive (pastikan akses: Anyone with the link)
+
+
+        // Anchor/focus gambar background. Default: "50% 12%" (top-center agak turun)
+        // Tips: kalau wajah terlalu KE ATAS -> ubah jadi "50% 6%". Kalau terlalu KE BAWAH -> "50% 18%".
+        coverBackgroundPosition: "50% 28%",
+
+        // 0..1 agar teks tetap terbaca di atas foto (semakin besar semakin gelap)
+        coverOverlayOpacity: 0.85,
+
+        audioUrl: "wedding-song.mp3" // pastikan file ada di repo GitHub Pages
+      },
+      gifts: {
+        note: "\"Terima kasih atas do'a, perhatian, dan kehadirannya. Semoga menjadi berkah untuk kami semua.\"",
+        accounts: [
+          { bank: "BCA", name: "Nama Penerima 1", number: "1234567890123456" },
+          { bank: "BCA", name: "Nama Penerima 2", number: "9876543210987654" }
+        ]
+      }
+    };
+
+    // Backward-compat: jika masih ada config lama (bride/groom), petakan otomatis
+    if (window.INVITE_CONFIG?.couple) {
+      const c = window.INVITE_CONFIG.couple;
+      if (c.bride && !c.brideFull) c.brideFull = c.bride;
+      if (c.groom && !c.groomFull) c.groomFull = c.groom;
+      if (c.bride && !c.brideShort) c.brideShort = c.bride;
+      if (c.groom && !c.groomShort) c.groomShort = c.groom;
+
+      // Fallback inisial
+      if (!c.brideInitial) c.brideInitial = (c.brideShort || c.brideFull || "B").trim().charAt(0);
+      if (!c.groomInitial) c.groomInitial = (c.groomShort || c.groomFull || "G").trim().charAt(0);
+    }
+
+  </script>
+
+  <noscript>
+    <div style="max-width:600px;margin:12px auto;padding:14px;border-radius:12px;border:1px solid #e8e3d8;background:#fff;">
+      Website ini membutuhkan JavaScript agar fitur (cover, musik, countdown, RSVP) berjalan.
+    </div>
+  </noscript>
+
+  <!-- Audio -->
+  <audio id="bgMusic" loop preload="auto"></audio>
+
+  <!-- Toast (Tailwind utility used just for quick styling) -->
+  <div class="toast" id="toast" aria-live="polite" aria-atomic="true">
+    <div class="rounded-2xl border border-white/10 bg-black/60 px-4 py-3 text-sm text-white shadow-lg backdrop-blur">
+      <span id="toastMsg">OK</span>
+    </div>
+  </div>
+
+  <div class="music-player" id="musicPlayer" aria-label="Music player">
+    <button class="music-btn" id="musicBtn" type="button" aria-pressed="false" title="Music">
+      <svg class="music-icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      <svg class="music-icon-pause" viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>
+    </button>
+  </div>
+
+  <div class="cover-page" id="coverPage">
+    <div class="cover-bg-pattern">
+      <div class="cover-circle"></div><div class="cover-circle"></div><div class="cover-circle"></div>
+    </div>
+    <div class="cover-particles">
+      <div class="cover-particle"></div><div class="cover-particle"></div><div class="cover-particle"></div><div class="cover-particle"></div><div class="cover-particle"></div><div class="cover-particle"></div>
+    </div>
+
+    <div class="cover-content">
+      <svg class="cover-ornament" viewBox="0 0 150 150">
+        <circle cx="75" cy="75" r="60" fill="none" stroke="#c4b5a0" stroke-width="0.5"/>
+        <circle cx="75" cy="75" r="50" fill="none" stroke="#c4b5a0" stroke-width="0.5"/>
+        <circle cx="75" cy="75" r="40" fill="none" stroke="#c4b5a0" stroke-width="0.5"/>
+        <circle cx="75" cy="75" r="30" fill="none" stroke="#8b7355" stroke-width="1"/>
+        <path d="M75,15 L75,135 M15,75 L135,75" stroke="#c4b5a0" stroke-width="0.5"/>
+        <path d="M35,35 L115,115 M35,115 L115,35" stroke="#c4b5a0" stroke-width="0.3"/>
+        <circle cx="75" cy="15" r="5" fill="#c4b5a0"/>
+        <circle cx="75" cy="135" r="5" fill="#c4b5a0"/>
+        <circle cx="15" cy="75" r="5" fill="#c4b5a0"/>
+        <circle cx="135" cy="75" r="5" fill="#c4b5a0"/>
+        <circle cx="35" cy="35" r="3" fill="#a39382"/>
+        <circle cx="115" cy="35" r="3" fill="#a39382"/>
+        <circle cx="35" cy="115" r="3" fill="#a39382"/>
+        <circle cx="115" cy="115" r="3" fill="#a39382"/>
+        <circle cx="75" cy="75" r="8" fill="#8b7355" opacity="0.3"/>
+      </svg>
+
+      <p class="cover-label">The Wedding of</p>
+      <h1 class="cover-title">Our Special Day</h1>
+
+      <div class="cover-names">
+        <span id="coverBride">Bride</span><br>
+        <span class="cover-ampersand">&</span>
+        <span id="coverGroom">Groom</span>
+      </div>
+
+      <p class="cover-date" id="coverDate">15 • 02 • 2025</p>
+
+      <div class="cover-guest">
+        Kepada Yth.<br>
+        <strong id="guestName">Bapak/Ibu/Saudara/i</strong>
+        <div style="font-size:.8em; opacity:.85; margin-top:6px;">(Tambahkan <code>?to=Nama%20Tamu</code> di URL untuk menyapa tamu)</div>
+      </div>
+
+      <button class="open-invitation-btn" id="openBtn" type="button"><span>BUKA UNDANGAN</span></button>
+    </div>
+
+    <div class="scroll-hint" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 5V19M12 19L5 12M12 19L19 12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+
+  <div class="container" id="mainContainer">
+    <svg class="corner-decoration corner-top-left" viewBox="0 0 120 120"><path d="M0,0 Q30,0 30,30 L0,30 Z" fill="#8b7355"/><circle cx="30" cy="30" r="15" fill="none" stroke="#c4b5a0" stroke-width="1"/></svg>
+    <svg class="corner-decoration corner-top-right" viewBox="0 0 120 120"><path d="M0,0 Q30,0 30,30 L0,30 Z" fill="#8b7355"/><circle cx="30" cy="30" r="15" fill="none" stroke="#c4b5a0" stroke-width="1"/></svg>
+    <svg class="corner-decoration corner-bottom-left" viewBox="0 0 120 120"><path d="M0,0 Q30,0 30,30 L0,30 Z" fill="#8b7355"/><circle cx="30" cy="30" r="15" fill="none" stroke="#c4b5a0" stroke-width="1"/></svg>
+    <svg class="corner-decoration corner-bottom-right" viewBox="0 0 120 120"><path d="M0,0 Q30,0 30,30 L0,30 Z" fill="#8b7355"/><circle cx="30" cy="30" r="15" fill="none" stroke="#c4b5a0" stroke-width="1"/></svg>
+
+    <div class="particles" aria-hidden="true">
+      <div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div>
+    </div>
+
+    <div class="header fade-in-section">
+      <svg class="ornament" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="35" fill="none" stroke="#c4b5a0" stroke-width="0.5"/>
+        <circle cx="50" cy="50" r="30" fill="none" stroke="#c4b5a0" stroke-width="0.5"/>
+        <circle cx="50" cy="50" r="25" fill="none" stroke="#c4b5a0" stroke-width="0.5"/>
+        <path d="M50,15 L50,85 M15,50 L85,50" stroke="#c4b5a0" stroke-width="0.5"/>
+        <circle cx="50" cy="15" r="4" fill="#c4b5a0"/>
+        <circle cx="50" cy="85" r="4" fill="#c4b5a0"/>
+        <circle cx="15" cy="50" r="4" fill="#c4b5a0"/>
+        <circle cx="85" cy="50" r="4" fill="#c4b5a0"/>
+      </svg>
+      <p>The Wedding of</p>
+      <h1><span id="mainBride">Bride</span> & <span id="mainGroom">Groom</span></h1>
+      <div class="pattern-border" style="bottom: 0;"></div>
+    </div>
+
+    <div class="couple fade-in-section" id="couple">
+      <svg class="floral-decoration floral-left" viewBox="0 0 200 400"><path d="M100,50 Q120,100 100,150 Q80,100 100,50" fill="#8b7355"/><path d="M100,150 Q120,200 100,250 Q80,200 100,150" fill="#a39382"/><path d="M100,250 Q120,300 100,350 Q80,300 100,250" fill="#c4b5a0"/></svg>
+      <svg class="floral-decoration floral-right" viewBox="0 0 200 400"><path d="M100,50 Q120,100 100,150 Q80,100 100,50" fill="#8b7355"/><path d="M100,150 Q120,200 100,250 Q80,200 100,150" fill="#a39382"/><path d="M100,250 Q120,300 100,350 Q80,300 100,250" fill="#c4b5a0"/></svg>
+
+      <h2>Assalamualaikum Wr. Wb.</h2>
+      <p>Dengan memohon rahmat dan ridho Allah SWT,<br>kami bermaksud mengundang Bapak/Ibu/Saudara/i<br>untuk hadir di acara pernikahan kami:</p>
+      <div class="divider"></div>
+
+      <div class="photo-frame" id="photoFrame">
+        <img id="couplePhoto" alt="Foto Couple" />
+        <div class="photo-overlay"></div>
+
+        <div class="corner-ornament top-left"></div>
+        <div class="corner-ornament top-right"></div>
+        <div class="corner-ornament bottom-left"></div>
+        <div class="corner-ornament bottom-right"></div>
+
+        <div class="photo-placeholder" id="photoPlaceholder">
+          <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+          <span>Foto Couple</span>
+        </div>
+      </div>
+
+      <div class="names-container">
+        <div class="names" id="nameBride">Nama Bride</div>
+        <span class="ampersand">&</span>
+        <div class="names" id="nameGroom">Nama Groom</div>
+      </div>
+    </div>
+
+    <div class="date-section fade-in-section" id="date">
+      <div class="date-box">
+        <div class="day" id="dayName">Sabtu</div>
+        <div class="details">
+          <span id="dateLong">15 Februari 2025</span><br>
+          <span id="timeText">Pukul 09.00 WIB - Selesai</span>
+        </div>
+
+        <div class="countdown" aria-label="Countdown">
+          <div class="cd-item"><div class="cd-num" id="cdDays">0</div><div class="cd-lbl">Hari</div></div>
+          <div class="cd-item"><div class="cd-num" id="cdHours">00</div><div class="cd-lbl">Jam</div></div>
+          <div class="cd-item"><div class="cd-num" id="cdMinutes">00</div><div class="cd-lbl">Menit</div></div>
+          <div class="cd-item"><div class="cd-num" id="cdSeconds">00</div><div class="cd-lbl">Detik</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="decorative-section fade-in-section">
+      <svg class="large-ornament" viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="80" fill="none" stroke="#c4b5a0" stroke-width="1" opacity="0.3"/>
+        <circle cx="100" cy="100" r="60" fill="none" stroke="#8b7355" stroke-width="1" opacity="0.4"/>
+        <circle cx="100" cy="100" r="40" fill="none" stroke="#c4b5a0" stroke-width="1" opacity="0.5"/>
+        <path d="M100,20 L100,180 M20,100 L180,100" stroke="#c4b5a0" stroke-width="0.5" opacity="0.3"/>
+        <circle cx="100" cy="20" r="8" fill="#c4b5a0" opacity="0.5"/>
+        <circle cx="100" cy="180" r="8" fill="#c4b5a0" opacity="0.5"/>
+        <circle cx="20" cy="100" r="8" fill="#c4b5a0" opacity="0.5"/>
+        <circle cx="180" cy="100" r="8" fill="#c4b5a0" opacity="0.5"/>
+      </svg>
+      <p class="decorative-text" id="dateShort">15 • 02 • 2025</p>
+      <p class="decorative-subtext">Save The Date</p>
+      <div class="decorative-line"></div>
+      <div class="decorative-dots"><span></span><span></span><span></span></div>
+    </div>
+
+    <div class="location fade-in-section" id="location">
+      <h3>Lokasi Acara</h3>
+      <p><strong id="venueName">Gedung Pernikahan</strong><br><span id="venueAddress">Jl. Contoh No. 123<br>Jakarta Selatan, DKI Jakarta</span></p>
+
+      <div class="location-actions">
+        <a href="https://maps.google.com" target="_blank" rel="noreferrer" class="map-btn" id="mapsBtn"><span style="position: relative; z-index: 1;">Buka Google Maps</span></a>
+        <a href="#" class="map-btn" id="addToCalBtn" style="background: linear-gradient(135deg, #c4b5a0 0%, #8b7355 100%);"><span style="position: relative; z-index: 1;">Tambah ke Kalender</span></a>
+      </div>
+
+      <div class="map-embed" id="mapEmbedWrap">
+        <iframe id="mapEmbed" title="Peta lokasi" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+    </div>
+
+    <div class="rsvp fade-in-section" id="rsvp">
+      <h3>Konfirmasi Kehadiran</h3>
+      <form class="rsvp-form" id="rsvpForm">
+        <input id="rsvpName" type="text" placeholder="Nama Lengkap" required>
+        <select id="rsvpAttend" required>
+          <option value="">Konfirmasi Kehadiran</option>
+          <option value="Hadir">Hadir</option>
+          <option value="Tidak Hadir">Tidak Hadir</option>
+          <option value="Masih Ragu">Masih Ragu</option>
+        </select>
+        <input id="rsvpCount" type="number" placeholder="Jumlah Tamu" min="1" max="5" value="1">
+        <textarea id="rsvpMsg" placeholder="Ucapan & Doa (Optional)"></textarea>
+        <button type="submit"><span style="position: relative; z-index: 1;">Kirim Konfirmasi</span></button>
+      </form>
+
+      <div class="rsvp-note" id="rsvpNotice"></div>
+
+      <div class="rsvp-list" id="rsvpListWrap">
+        <div style="display:flex; align-items:center; justify-content: space-between; gap: 10px;">
+          <h4>Ucapan Terakhir</h4>
+          <button type="button" id="exportRsvp" class="secondary-btn" style="margin-top:0; padding: 10px 16px;">Export CSV</button>
+        </div>
+        <div id="rsvpList"></div>
+        <div style="text-align:center; margin-top: 12px;">
+          <button type="button" id="clearRsvp" class="secondary-btn">Reset RSVP (Perangkat ini)</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="gift-section fade-in-section" id="gift">
+      <h3>Amplop Digital</h3>
+      <p>Tanpa mengurangi rasa hormat, bagi keluarga dan sahabat yang ingin mengirimkan hadiah,<br>dapat melalui nomor rekening berikut:</p>
+
+      <div class="cards-container" id="giftCards"></div>
+
+      <div class="gift-note"><p id="giftNote">"Terima kasih atas do'a, perhatian, dan kehadirannya. Semoga menjadi berkah untuk kami semua."</p></div>
+    </div>
+
+    <div class="footer fade-in-section">
+      <div class="divider"></div>
+      <p class="quote">"Di antara tanda-tanda (kebesaran)-Nya ialah bahwa Dia menciptakan pasangan-pasangan untukmu dari (jenis) dirimu sendiri agar kamu merasa tenteram kepadanya. Dia menjadikan di antaramu rasa cinta dan kasih sayang. Sesungguhnya pada yang demikian itu benar-benar terdapat tanda-tanda (kebesaran Allah) bagi kaum yang berpikir."</p>
+      <p class="reference">(QS. Ar-Rum: 21)</p>
+      <div class="divider" style="margin-top: 40px;"></div>
+      <p class="closing">Wassalamualaikum Wr. Wb.</p>
+      <svg style="width: 60px; margin-top: 20px; opacity: 0.3;" viewBox="0 0 200 50" aria-hidden="true">
+        <circle cx="100" cy="25" r="4" fill="#8b7355"/>
+        <circle cx="60" cy="25" r="3" fill="#8b7355"/>
+        <circle cx="140" cy="25" r="3" fill="#8b7355"/>
+        <line x1="30" y1="25" x2="170" y2="25" stroke="#c4b5a0" stroke-width="0.5"/>
+      </svg>
+    </div>
+  </div>
+
+  <script>
+    const cfg = window.INVITE_CONFIG;
+
+    const $ = (sel, root = document) => root.querySelector(sel);
+
+    // ========== Stable viewport height (mobile address-bar jitter fix) ==========
+    // iOS/Android sering mengubah viewport height saat address bar hide/show, bikin layout terasa "goyang".
+    // Kita set CSS var --vh sekali (dan saat orientasi berubah) agar tinggi cover stabil.
+    function setStableVh(force = false){
+      const h = (window.visualViewport && window.visualViewport.height) ? window.visualViewport.height : window.innerHeight;
+      if (!h) return;
+      const px = (h * 0.01) + "px";
+      if (force) {
+        document.documentElement.style.setProperty('--vh', px);
+        return;
+      }
+      const cur = getComputedStyle(document.documentElement).getPropertyValue('--vh').trim();
+      if (cur !== px) document.documentElement.style.setProperty('--vh', px);
+    }
+
+    function initStableViewport(){
+      setStableVh(true);
+
+      let lastW = window.innerWidth;
+      let lastH = window.innerHeight;
+
+      window.addEventListener('orientationchange', () => {
+        setTimeout(() => setStableVh(true), 400);
+      });
+
+      // Hindari update saat scroll (address bar hide/show) -> update hanya jika perubahan besar
+      window.addEventListener('resize', () => {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        const dw = Math.abs(w - lastW);
+        const dh = Math.abs(h - lastH);
+        if (dw > 60 || dh > 120) {
+          lastW = w;
+          lastH = h;
+          setStableVh(true);
+        }
+      });
+    }
+
+    function toast(msg){
+      const t = $("#toast");
+      const tm = $("#toastMsg");
+      tm.textContent = msg;
+      t.classList.add("show");
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
+    }
+
+    function format2(n){ return String(n).padStart(2,'0'); }
+
+    function parseGuestName(){
+      const u = new URL(window.location.href);
+      const raw = u.searchParams.get("to") || u.searchParams.get("kepada") || u.searchParams.get("tamu");
+      if (!raw) return null;
+      return raw.replace(/\+/g, " ").trim();
+    }
+
+    function maskGroups(num){
+      const s = String(num || "").replace(/\s+/g, "");
+      if (!s) return "";
+      return s.replace(/(.{4})/g, "$1 ").trim();
+    }
+
+    // ========== Asset URL resolver (GitHub Pages safe) ==========
+    function isAbsoluteUrl(u){
+      return /^(?:[a-z][a-z0-9+.-]*:)?\/\//i.test(u) || /^data:|^blob:/i.test(u);
+    }
+
+    function guessGithubPagesBasePath(){
+      // Project pages: https://username.github.io/repo-name/...
+      // User pages: https://username.github.io/...
+      const host = window.location.hostname;
+      const parts = window.location.pathname.split('/').filter(Boolean);
+      if (host.endsWith('github.io') && parts.length > 0) return '/' + parts[0] + '/';
+      return '/';
+    }
+
+    function resolveAssetUrl(input){
+      const u = String(input || "").trim();
+      if (!u) return "";
+      if (isAbsoluteUrl(u)) return u;
+
+      // If user accidentally uses root-path (/images/..), fix for GitHub project pages
+      if (u.startsWith('/')) {
+        const base = guessGithubPagesBasePath();
+        return new URL(base + u.replace(/^\/+/, ''), window.location.origin).toString();
+      }
+
+      // Normal relative path
+      return new URL(u, window.location.href).toString();
+    }
+
+    // ========== Music ==========
+    const bgMusic = document.getElementById('bgMusic');
+    const musicBtn = document.getElementById('musicBtn');
+    const musicPlayer = document.getElementById('musicPlayer');
+    let isPlaying = false;
+
+    async function playMusic() {
+      try {
+        await bgMusic.play();
+        isPlaying = true;
+        musicBtn.classList.add('playing');
+        musicBtn.setAttribute('aria-pressed', 'true');
+      } catch (error) {
+        // autoplay prevented
+        isPlaying = false;
+        musicBtn.classList.remove('playing');
+        musicBtn.setAttribute('aria-pressed', 'false');
+      }
+    }
+
+    function pauseMusic() {
+      bgMusic.pause();
+      isPlaying = false;
+      musicBtn.classList.remove('playing');
+      musicBtn.setAttribute('aria-pressed', 'false');
+    }
+
+    musicBtn.addEventListener('click', function() {
+      isPlaying ? pauseMusic() : playMusic();
+    });
+
+    // ========== Hydrate content from config ==========
+    function hydrate(){
+      document.title = `${cfg.couple.brideFull} & ${cfg.couple.groomFull} — Wedding Invitation`;
+
+      // Names (Cover = nama panggilan, isi undangan = nama lengkap)
+      $("#coverBride").textContent = cfg.couple.brideShort;
+      $("#coverGroom").textContent = cfg.couple.groomShort;
+      const brideInitial = cfg.couple.brideInitial || (cfg.couple.brideShort || cfg.couple.brideFull || "B").trim().charAt(0);
+      const groomInitial = cfg.couple.groomInitial || (cfg.couple.groomShort || cfg.couple.groomFull || "G").trim().charAt(0);
+      $("#mainBride").textContent = brideInitial;
+      $("#mainGroom").textContent = groomInitial;
+      $("#nameBride").textContent = cfg.couple.brideFull;
+      $("#nameGroom").textContent = cfg.couple.groomFull;
+
+      // Date
+      $("#coverDate").textContent = cfg.event.dateShort;
+      $("#dateShort").textContent = cfg.event.dateShort;
+      $("#dayName").textContent = cfg.event.dayName;
+      $("#dateLong").textContent = cfg.event.dateLong;
+      $("#timeText").textContent = cfg.event.time;
+
+      // Cover background photo (optional)
+      const cover = $("#coverPage");
+      const bgRaw = String(cfg.media?.coverBackground || "").trim();
+      const bg = resolveAssetUrl(bgRaw);
+      if (bg) {
+        // Preload so we can detect 404/CORS early
+        const img = new Image();
+        img.onload = () => {
+          cover.classList.add("has-cover-bg");
+          cover.style.setProperty("--cover-bg-image", `url(\"${bg.replace(/\"/g, '\\"')}\")`);
+          cover.style.setProperty("--cover-bg-pos", cfg.media?.coverBackgroundPosition || "50% 12%");
+          const op = cfg.media?.coverOverlayOpacity;
+          cover.style.setProperty("--cover-overlay-opacity", typeof op === "number" ? String(op) : "0.85");
+        };
+        img.onerror = () => {
+          // Fallback: no cover image
+          cover.classList.remove("has-cover-bg");
+          cover.style.setProperty("--cover-bg-image", "none");
+          cover.style.setProperty("--cover-overlay-opacity", "0");
+          console.warn("Cover background failed to load:", bgRaw);
+          toast("Cover background tidak bisa dimuat. Cek path/izin file.");
+        };
+        img.referrerPolicy = "no-referrer";
+        img.src = bg;
+      } else {
+        cover.classList.remove("has-cover-bg");
+        cover.style.setProperty("--cover-bg-image", "none");
+        cover.style.setProperty("--cover-overlay-opacity", "0");
+      }
+
+      // Location
+      $("#venueName").textContent = cfg.event.venueName;
+      $("#venueAddress").innerHTML = cfg.event.venueAddressHtml;
+      $("#mapsBtn").href = cfg.event.mapsUrl;
+
+      // Map embed (best-effort)
+      const embed = $("#mapEmbed");
+      try {
+        const mapsUrl = cfg.event.mapsUrl;
+        let embedUrl = mapsUrl;
+        if (mapsUrl.includes("google.com/maps") || mapsUrl.includes("maps.google")) {
+          const u = new URL(mapsUrl);
+          u.searchParams.set("output", "embed");
+          embedUrl = u.toString();
+        } else {
+          embedUrl = "https://www.google.com/maps?q=" + encodeURIComponent(cfg.event.venueName) + "&output=embed";
+        }
+        embed.src = embedUrl;
+      } catch {
+        $("#mapEmbedWrap").style.display = "none";
+      }
+
+      // Audio
+      bgMusic.innerHTML = "";
+      const src = document.createElement("source");
+      src.src = resolveAssetUrl(cfg.media.audioUrl);
+      src.type = "audio/mpeg";
+      bgMusic.appendChild(src);
+
+      // Photo
+      if (cfg.media.couplePhoto) {
+        const img = $("#couplePhoto");
+        img.src = resolveAssetUrl(cfg.media.couplePhoto);
+        img.addEventListener("load", () => {
+          $("#photoFrame").classList.add("has-photo");
+        });
+        img.addEventListener("error", () => {
+          // keep placeholder
+        });
+      }
+
+      // Guest
+      const guest = parseGuestName();
+      if (guest) {
+        $("#guestName").textContent = guest;
+        $("#rsvpName").value = guest;
+      }
+
+      // Gift note
+      $("#giftNote").textContent = cfg.gifts.note;
+
+      // Gift cards
+      renderGiftCards(cfg.gifts.accounts || []);
+    }
+
+    // ========== Countdown ==========
+    function startCountdown(){
+      const target = new Date(cfg.event.dateISO).getTime();
+      if (!Number.isFinite(target)) return;
+
+      const tick = () => {
+        const now = Date.now();
+        let diff = Math.max(0, target - now);
+
+        const days = Math.floor(diff / (1000*60*60*24));
+        diff -= days * (1000*60*60*24);
+        const hours = Math.floor(diff / (1000*60*60));
+        diff -= hours * (1000*60*60);
+        const minutes = Math.floor(diff / (1000*60));
+        diff -= minutes * (1000*60);
+        const seconds = Math.floor(diff / 1000);
+
+        $("#cdDays").textContent = String(days);
+        $("#cdHours").textContent = format2(hours);
+        $("#cdMinutes").textContent = format2(minutes);
+        $("#cdSeconds").textContent = format2(seconds);
+      };
+
+      tick();
+      setInterval(tick, 1000);
+    }
+
+    // ========== Calendar ==========
+    function initCalendar(){
+      const btn = $("#addToCalBtn");
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        const start = new Date(cfg.event.dateISO);
+        const end = new Date(start.getTime() + 3 * 60 * 60 * 1000);
+        const fmt = (d) => {
+          const pad = (n) => String(n).padStart(2, "0");
+          return (
+            d.getUTCFullYear() +
+            pad(d.getUTCMonth() + 1) +
+            pad(d.getUTCDate()) +
+            "T" +
+            pad(d.getUTCHours()) +
+            pad(d.getUTCMinutes()) +
+            pad(d.getUTCSeconds()) +
+            "Z"
+          );
+        };
+
+        const text = encodeURIComponent(`Pernikahan ${cfg.couple.brideFull} & ${cfg.couple.groomFull}`);
+        const details = encodeURIComponent(cfg.event.time);
+        const location = encodeURIComponent(`${cfg.event.venueName} — ${cfg.event.venueAddressHtml.replace(/<br>/g, ", ").replace(/<[^>]*>/g, "")}`);
+        const dates = `${fmt(start)}/${fmt(end)}`;
+        const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${text}&details=${details}&location=${location}&dates=${dates}`;
+        window.open(url, "_blank", "noopener,noreferrer");
+      });
+    }
+
+    // ========== Gift cards ==========
+    function renderGiftCards(accounts){
+      const wrap = $("#giftCards");
+      wrap.innerHTML = "";
+
+      if (!accounts.length){
+        const div = document.createElement("div");
+        div.className = "atm-card";
+        div.innerHTML = "<div style='color:white; position:relative; z-index:1;'>Rekening belum diisi.</div>";
+        wrap.appendChild(div);
+        return;
+      }
+
+      accounts.forEach((acc) => {
+        const card = document.createElement("div");
+        card.className = "atm-card";
+        card.innerHTML = `
+          <div class="card-header" style="position:relative; z-index:1;">
+            <div class="card-bank">${escapeHtml(acc.bank)}</div>
+            <div class="card-chip"></div>
+          </div>
+          <div class="card-number" style="position:relative; z-index:1;">${escapeHtml(maskGroups(acc.number))}</div>
+          <div class="card-details" style="position:relative; z-index:1;">
+            <div class="card-holder">
+              <div class="card-label">Card Holder</div>
+              <div class="card-name">${escapeHtml(acc.name)}</div>
+            </div>
+            <svg class="card-logo" viewBox="0 0 60 40" aria-hidden="true">
+              <circle cx="20" cy="20" r="15" fill="rgba(255,255,255,0.8)"/>
+              <circle cx="40" cy="20" r="15" fill="rgba(255,255,255,0.6)"/>
+            </svg>
+          </div>
+          <button class="copy-button" type="button">
+            <svg class="copy-icon" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+            Salin Nomor Rekening
+          </button>
+        `;
+
+        const btn = card.querySelector(".copy-button");
+        btn.addEventListener("click", () => copyToClipboard(acc.number, btn));
+
+        wrap.appendChild(card);
+      });
+    }
+
+    // ========== RSVP storage ==========
+    const RSVP_KEY = "wedding_rsvp_v2";
+
+    function loadRsvps(){
+      try { return JSON.parse(localStorage.getItem(RSVP_KEY) || "[]"); } catch { return []; }
+    }
+
+    function saveRsvps(items){
+      localStorage.setItem(RSVP_KEY, JSON.stringify(items));
+    }
+
+    function escapeHtml(s) {
+      return String(s || "").replace(/[&<>"']/g, (c) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      }[c]));
+    }
+
+    function badgeClass(attend){
+      if (attend === "Hadir") return "badge-hadir";
+      if (attend === "Tidak Hadir") return "badge-tidak";
+      return "badge-ragu";
+    }
+
+    function renderRsvpList(){
+      const items = loadRsvps();
+      const wrap = $("#rsvpList");
+      wrap.innerHTML = "";
+
+      if (!items.length){
+        const empty = document.createElement("div");
+        empty.className = "rsvp-item";
+        empty.textContent = "Belum ada RSVP yang tersimpan di perangkat ini.";
+        wrap.appendChild(empty);
+        return;
+      }
+
+      items.slice(0, 10).forEach((it) => {
+        const row = document.createElement("div");
+        row.className = "rsvp-item";
+        const when = new Date(it.at).toLocaleString("id-ID");
+        row.innerHTML = `
+          <div class="top">
+            <div>
+              <div class="name">${escapeHtml(it.name)}</div>
+              <div class="meta">${escapeHtml(it.attend)} • ${escapeHtml(String(it.count || 1))} tamu • ${escapeHtml(when)}</div>
+            </div>
+            <div class="badge ${badgeClass(it.attend)}">${escapeHtml(it.attend)}</div>
+          </div>
+          ${it.msg ? `<div class="msg">${escapeHtml(it.msg)}</div>` : `<div class="msg" style="opacity:.7;">(Tanpa pesan)</div>`}
+        `;
+        wrap.appendChild(row);
+      });
+    }
+
+    function initRsvp(){
+      const form = $("#rsvpForm");
+      const notice = $("#rsvpNotice");
+
+      renderRsvpList();
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = $("#rsvpName").value.trim();
+        const attend = $("#rsvpAttend").value;
+        const count = Math.min(5, Math.max(1, Number($("#rsvpCount").value || "1")));
+        const msg = $("#rsvpMsg").value.trim();
+
+        if (!name || !attend) {
+          toast("Mohon isi nama dan konfirmasi kehadiran");
+          return;
+        }
+
+        const items = loadRsvps();
+        items.unshift({ name, attend, count, msg, at: new Date().toISOString() });
+        saveRsvps(items);
+
+        notice.style.display = "block";
+        notice.textContent = "Terima kasih! RSVP Anda tersimpan di perangkat ini.";
+        toast("RSVP terkirim");
+
+        $("#rsvpMsg").value = "";
+        renderRsvpList();
+      });
+
+      $("#clearRsvp").addEventListener("click", () => {
+        if (!confirm("Reset semua RSVP yang tersimpan di perangkat ini?")) return;
+        saveRsvps([]);
+        renderRsvpList();
+        toast("RSVP direset");
+      });
+
+      $("#exportRsvp").addEventListener("click", () => {
+        const items = loadRsvps();
+        if (!items.length) return toast("Tidak ada data untuk diexport");
+
+        const header = ["name","attend","count","msg","at"].join(",");
+        const rows = items.map(it => [csvCell(it.name), csvCell(it.attend), csvCell(it.count), csvCell(it.msg), csvCell(it.at)].join(","));
+        const csv = [header, ...rows].join("\n");
+
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "rsvp.csv";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      });
+    }
+
+    function csvCell(v){
+      const s = String(v ?? "");
+      return `"${s.replace(/"/g, '""')}"`;
+    }
+
+    // ========== Fade in on scroll ==========
+    function initFadeIn(){
+      const faders = document.querySelectorAll('.fade-in-section');
+      const appearOptions = { threshold: 0.15, rootMargin: "0px 0px -50px 0px" };
+      const appearOnScroll = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            appearOnScroll.unobserve(entry.target);
+          }
+        });
+      }, appearOptions);
+      faders.forEach(fader => appearOnScroll.observe(fader));
+    }
+
+    // ========== Parallax on desktop (kept from your script) ==========
+    function initParallax(){
+      if (window.innerWidth > 1024) {
+        window.addEventListener('scroll', function() {
+          const scrolled = window.pageYOffset;
+          document.querySelectorAll('.floral-decoration, .bg-decoration').forEach((el, i) => {
+            if (el) el.style.transform = `translateY(${scrolled * (0.5 + i * 0.1)}px)`;
+          });
+        });
+      }
+    }
+
+    // ========== Copy helpers ==========
+    function copyToClipboard(text, button) {
+      const cleanNumber = String(text || "").replace(/\s/g, '');
+      if (!cleanNumber) return;
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(cleanNumber)
+          .then(() => showCopySuccess(button))
+          .catch(() => fallbackCopy(cleanNumber, button));
+      } else {
+        fallbackCopy(cleanNumber, button);
+      }
+    }
+
+    function fallbackCopy(text, button) {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        showCopySuccess(button);
+      } catch (err) {
+        toast('Nomor rekening: ' + text);
+      }
+      document.body.removeChild(textArea);
+    }
+
+    function showCopySuccess(button) {
+      const originalText = button.innerHTML;
+      button.classList.add('copied');
+      button.innerHTML = `<svg class="copy-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="white"/></svg> Berhasil Disalin!`;
+      toast('Nomor rekening tersalin');
+      setTimeout(() => {
+        button.classList.remove('copied');
+        button.innerHTML = originalText;
+      }, 2000);
+    }
+
+    // ========== Cover open ==========
+    function initCoverOpen(){
+      const openBtn = document.getElementById('openBtn');
+      const coverPage = document.getElementById('coverPage');
+      const mainContainer = document.getElementById('mainContainer');
+
+      openBtn.addEventListener('click', function() {
+        coverPage.classList.add('hidden');
+        setTimeout(() => {
+          mainContainer.classList.add('visible');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          setTimeout(() => musicPlayer.classList.add('show'), 500);
+          playMusic();
+        }, 500);
+      });
+    }
+
+    // Init
+    document.addEventListener('DOMContentLoaded', function() {
+      initStableViewport();
+      hydrate();
+      startCountdown();
+      initCoverOpen();
+      initCalendar();
+      initFadeIn();
+      initParallax();
+      initRsvp();
+    });
+  </script>
+</body>
+</html>
