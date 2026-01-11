@@ -845,6 +845,35 @@
       return s.replace(/(.{4})/g, "$1 ").trim();
     }
 
+    // ========== Asset URL resolver (GitHub Pages safe) ==========
+    function isAbsoluteUrl(u){
+      return /^(?:[a-z][a-z0-9+.-]*:)?\/\//i.test(u) || /^data:|^blob:/i.test(u);
+    }
+
+    function guessGithubPagesBasePath(){
+      // Project pages: https://username.github.io/repo-name/...
+      // User pages: https://username.github.io/...
+      const host = window.location.hostname;
+      const parts = window.location.pathname.split('/').filter(Boolean);
+      if (host.endsWith('github.io') && parts.length > 0) return '/' + parts[0] + '/';
+      return '/';
+    }
+
+    function resolveAssetUrl(input){
+      const u = String(input || "").trim();
+      if (!u) return "";
+      if (isAbsoluteUrl(u)) return u;
+
+      // If user accidentally uses root-path (/images/..), fix for GitHub project pages
+      if (u.startsWith('/')) {
+        const base = guessGithubPagesBasePath();
+        return new URL(base + u.replace(/^\/+/, ''), window.location.origin).toString();
+      }
+
+      // Normal relative path
+      return new URL(u, window.location.href).toString();
+    }
+
     // ========== Music ==========
     const bgMusic = document.getElementById('bgMusic');
     const musicBtn = document.getElementById('musicBtn');
@@ -899,13 +928,28 @@
 
       // Cover background photo (optional)
       const cover = $("#coverPage");
-      const bg = String(cfg.media?.coverBackground || "").trim();
+      const bgRaw = String(cfg.media?.coverBackground || "").trim();
+      const bg = resolveAssetUrl(bgRaw);
       if (bg) {
-        cover.classList.add("has-cover-bg");
-        cover.style.setProperty("--cover-bg-image", `url(\"${bg.replace(/\"/g, '\\"')}\")`);
-        cover.style.setProperty("--cover-bg-pos", cfg.media?.coverBackgroundPosition || "50% 12%");
-        const op = cfg.media?.coverOverlayOpacity;
-        cover.style.setProperty("--cover-overlay-opacity", typeof op === "number" ? String(op) : "0.85");
+        // Preload so we can detect 404/CORS early
+        const img = new Image();
+        img.onload = () => {
+          cover.classList.add("has-cover-bg");
+          cover.style.setProperty("--cover-bg-image", `url(\"${bg.replace(/\"/g, '\\"')}\")`);
+          cover.style.setProperty("--cover-bg-pos", cfg.media?.coverBackgroundPosition || "50% 12%");
+          const op = cfg.media?.coverOverlayOpacity;
+          cover.style.setProperty("--cover-overlay-opacity", typeof op === "number" ? String(op) : "0.85");
+        };
+        img.onerror = () => {
+          // Fallback: no cover image
+          cover.classList.remove("has-cover-bg");
+          cover.style.setProperty("--cover-bg-image", "none");
+          cover.style.setProperty("--cover-overlay-opacity", "0");
+          console.warn("Cover background failed to load:", bgRaw);
+          toast("Cover background tidak bisa dimuat. Cek path/izin file.");
+        };
+        img.referrerPolicy = "no-referrer";
+        img.src = bg;
       } else {
         cover.classList.remove("has-cover-bg");
         cover.style.setProperty("--cover-bg-image", "none");
@@ -937,14 +981,14 @@
       // Audio
       bgMusic.innerHTML = "";
       const src = document.createElement("source");
-      src.src = cfg.media.audioUrl;
+      src.src = resolveAssetUrl(cfg.media.audioUrl);
       src.type = "audio/mpeg";
       bgMusic.appendChild(src);
 
       // Photo
       if (cfg.media.couplePhoto) {
         const img = $("#couplePhoto");
-        img.src = cfg.media.couplePhoto;
+        img.src = resolveAssetUrl(cfg.media.couplePhoto);
         img.addEventListener("load", () => {
           $("#photoFrame").classList.add("has-photo");
         });
