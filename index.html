@@ -668,7 +668,7 @@
         // Foto di dalam undangan (carousel). Isi salah satu:
         // - couplePhotos: ["images/1.jpg", "images/2.jpg"]
         // - couplePhoto: "images/couple.jpg" (fallback lama, 1 foto)
-        couplePhotos: "foto1.jpg", "foto2.jpg",
+        couplePhotos: ["foto1.jpg", "foto2.jpg"],
         couplePhoto: "", // (opsional) fallback 1 foto
 
         // ===== COVER (WELCOME PAGE) BACKGROUND PORTRAIT =====
@@ -680,12 +680,17 @@
 
         // Anchor/focus gambar background. Default: "50% 12%" (top-center agak turun)
         // Tips: kalau wajah terlalu KE ATAS -> ubah jadi "50% 6%". Kalau terlalu KE BAWAH -> "50% 18%".
-        coverBackgroundPosition: "50% 0%",
+        coverBackgroundPosition: "50% 12%",
 
         // 0..1 agar teks tetap terbaca di atas foto (semakin besar semakin gelap)
         coverOverlayOpacity: 0.85,
 
-        audioUrl: "wedding-song.mp3" // pastikan file ada di repo GitHub Pages
+        audioUrl: "wedding-song.mp3", // pastikan file ada di repo GitHub Pages
+
+        // Cache-busting untuk asset (foto/audio) dari repo.
+        // Jika kamu mengganti file tapi namanya SAMA (mis. images/couple.jpg diganti isinya), browser sering masih menampilkan versi lama.
+        // Ubah nilai ini (mis. "v1" -> "v2") untuk memaksa reload asset.
+        assetVersion: "v1"
       },
       gifts: {
         note: "\"Terima kasih atas do'a, perhatian, dan kehadirannya. Semoga menjadi berkah untuk kami semua.\"",
@@ -1106,14 +1111,26 @@
       if (!u) return "";
       if (isAbsoluteUrl(u)) return u;
 
+      // Build base URL for local assets
+      let url;
+
       // If user accidentally uses root-path (/images/..), fix for GitHub project pages
       if (u.startsWith('/')) {
         const base = guessGithubPagesBasePath();
-        return new URL(base + u.replace(/^\/+/, ''), window.location.origin).toString();
+        url = new URL(base + u.replace(/^\/+/, ''), window.location.origin);
+      } else {
+        // Normal relative path
+        url = new URL(u, window.location.href);
       }
 
-      // Normal relative path
-      return new URL(u, window.location.href).toString();
+      // Cache-busting: append ?v=assetVersion for local repo assets
+      const ver = String(cfg?.media?.assetVersion || "").trim();
+      if (ver) {
+        // Only add if not already present
+        if (!url.searchParams.has('v')) url.searchParams.set('v', ver);
+      }
+
+      return url.toString();
     }
 
     // ========== Music ==========
@@ -1625,7 +1642,7 @@
         updateDots();
       });
 
-      // Error handling: if all fail, show placeholder
+      // Error handling: if fail, mark slide as broken (do not remove -> keep dots/index stable)
       const imgs = inner.querySelectorAll('img');
       let okCount = 0;
       let doneCount = 0;
@@ -1636,17 +1653,17 @@
         });
         im.addEventListener('error', () => {
           doneCount++;
-          // Hide broken image slide
-          im.closest('.photo-slide')?.remove();
+          const slide = im.closest('.photo-slide');
+          if (slide) slide.classList.add('broken');
+          console.warn('Couple photo failed to load:', im.src);
         });
       });
 
       // After a short delay, decide if nothing loaded
       setTimeout(() => {
-        const remaining = inner.querySelectorAll('img').length;
-        if (!remaining) {
+        if (okCount === 0) {
           frame.classList.remove('has-photos', 'single-photo');
-          toast('Foto couple tidak bisa dimuat. Cek path/izin file.');
+          toast('Foto couple tidak bisa dimuat. Pastikan path benar & case-sensitive (mis. images/Foto.jpg ≠ images/foto.jpg).');
         }
       }, 2500);
     }
@@ -1668,6 +1685,54 @@
       });
     }
 
+    function initDebugPanel(){
+      const u = new URL(window.location.href);
+      const on = u.searchParams.get('debug') === '1' || u.searchParams.get('debug') === 'true';
+      if (!on) return;
+
+      const panel = document.createElement('div');
+      panel.style.position = 'fixed';
+      panel.style.left = '12px';
+      panel.style.right = '12px';
+      panel.style.top = '12px';
+      panel.style.zIndex = '20000';
+      panel.style.background = 'rgba(0,0,0,0.72)';
+      panel.style.color = 'white';
+      panel.style.border = '1px solid rgba(255,255,255,0.2)';
+      panel.style.borderRadius = '14px';
+      panel.style.padding = '10px 12px';
+      panel.style.fontSize = '12px';
+      panel.style.lineHeight = '1.45';
+      panel.style.backdropFilter = 'blur(8px)';
+
+      const photos = (Array.isArray(cfg.media?.couplePhotos) && cfg.media.couplePhotos.length)
+        ? cfg.media.couplePhotos
+        : (cfg.media?.couplePhoto ? [cfg.media.couplePhoto] : []);
+
+      const resolved = photos.map(p => resolveAssetUrl(p));
+
+      panel.innerHTML = `
+        <div style="display:flex; justify-content: space-between; gap: 10px; align-items:flex-start;">
+          <div>
+            <div style="font-weight:600; letter-spacing:.3px;">Debug (asset paths)</div>
+            <div style="opacity:.9;">basePath: <code>${escapeHtml(guessGithubPagesBasePath())}</code></div>
+            <div style="opacity:.9;">assetVersion: <code>${escapeHtml(String(cfg.media?.assetVersion || ''))}</code></div>
+          </div>
+          <button id="dbgClose" type="button" style="padding:6px 10px; border-radius: 10px; border:1px solid rgba(255,255,255,.25); background: rgba(255,255,255,.12); color:#fff;">Tutup</button>
+        </div>
+        <div style="margin-top:8px;">
+          <div style="opacity:.9;">couplePhotos (raw): <code>${escapeHtml(JSON.stringify(photos))}</code></div>
+          <div style="opacity:.9;">couplePhotos (resolved):</div>
+          <ol style="margin:6px 0 0 18px; opacity:.95;">
+            ${resolved.map(r => `<li><code style="word-break: break-all;">${escapeHtml(r)}</code></li>`).join('')}
+          </ol>
+        </div>
+      `;
+
+      document.body.appendChild(panel);
+      panel.querySelector('#dbgClose')?.addEventListener('click', () => panel.remove());
+    }
+
     // Init
     document.addEventListener('DOMContentLoaded', function() {
       initStableViewport();
@@ -1679,10 +1744,8 @@
       initFadeIn();
       initParallax();
       initRsvp();
+      initDebugPanel();
     });
   </script>
 </body>
 </html>
-
-
-
