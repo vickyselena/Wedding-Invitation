@@ -146,12 +146,12 @@
     .ampersand {font-family: 'Italiana', serif;font-size: 2em;color: #c4b5a0;font-style: normal;margin: 12px 0;display: block;font-weight: 400;animation: scaleIn 1.5s ease-out;}
 
     /* ========== WINDOW STYLE PHOTO FRAME (ARCH TOP) ========== */
-    /* Ukuran sedang (lebih proporsional) — tetap bentuk “jendela antik” */
+    /* Frame “jendela antik” + carousel (geser kiri/kanan). Animasi di dalam frame DISABLE sesuai request. */
     .photo-frame {
-      width: 280px;
-      height: 360px;
+      width: 300px;
+      height: 400px;
       margin: 35px auto;
-      border-radius: 140px 140px 12px 12px;
+      border-radius: 150px 150px 14px 14px;
       border: 5px solid #d4cfc4;
       overflow: hidden;
       box-shadow:
@@ -161,16 +161,8 @@
         inset 0 0 30px rgba(255,255,255,0.5);
       position: relative;
       background: linear-gradient(135deg, #f5f2ed 0%, #e8e3d8 100%);
-      transition: all 0.5s ease;
-      animation: fadeInScale 1.5s ease-out;
-    }
-    .photo-frame:hover {
-      transform: translateY(-12px) scale(1.02);
-      box-shadow:
-        0 35px 70px rgba(139, 115, 85, 0.35),
-        0 15px 35px rgba(0,0,0,0.15),
-        inset 0 0 0 3px #f5f2ed,
-        inset 0 0 30px rgba(255,255,255,0.5);
+      transition: none;
+      animation: none;
     }
     .photo-frame::before {
       content: '';
@@ -180,31 +172,121 @@
       right: -12px;
       bottom: -12px;
       border: 2px solid #c4b5a0;
-      border-radius: 152px 152px 24px 24px;
+      border-radius: 162px 162px 26px 26px;
       opacity: 0.5;
       pointer-events: none;
-      animation: pulse 4s ease-in-out infinite;
+      animation: none;
     }
-    .photo-frame::after {
-      content: '';
+
+    /* Carousel viewport */
+    .photo-carousel {
       position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.6) 50%, transparent 70%);
-      animation: shimmer 4s infinite;
-      z-index: 3;
-      pointer-events: none;
+      inset: 0;
+      z-index: 1;
+      display: none;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+      touch-action: pan-x;
+    }
+    .photo-carousel::-webkit-scrollbar { display: none; }
+
+    .photo-carousel-inner { display: flex; height: 100%; }
+    .photo-slide {
+      flex: 0 0 100%;
+      height: 100%;
+      scroll-snap-align: center;
+      position: relative;
+    }
+    .photo-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      user-select: none;
+      -webkit-user-drag: none;
     }
 
-    .photo-frame img {width: 100%;height: 100%;object-fit: cover;position: relative;z-index: 1;transition: transform 0.5s ease;display:none;}
-    .photo-frame.has-photo img {display:block;}
-    .photo-frame.has-photo .photo-placeholder {display:none;}
-    .photo-frame:hover img {transform: scale(1.08);}
+    /* Fallback jika gambar gagal dimuat (tanpa animasi) */
+    .photo-slide.broken {
+      background: linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(0,0,0,0.10) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .photo-slide.broken img { display: none; }
+    .photo-slide.broken::after {
+      content: 'Foto tidak bisa dimuat';
+      color: rgba(255,255,255,0.95);
+      font-size: 0.85em;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.22);
+    }
 
+    .photo-frame.has-photos .photo-carousel { display: block; }
+    .photo-frame.has-photos .photo-placeholder { display: none; }
+
+    /* Nav buttons + dots */
+    .photo-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 6;
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.35);
+      background: rgba(0,0,0,0.25);
+      color: #fff;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .photo-nav svg { width: 22px; height: 22px; fill: none; stroke: rgba(255,255,255,0.95); stroke-width: 2.5; }
+    .photo-nav.prev { left: 10px; }
+    .photo-nav.next { right: 10px; }
+    .photo-nav:active { transform: translateY(-50%) scale(0.96); }
+
+    .photo-dots {
+      position: absolute;
+      left: 50%;
+      bottom: 12px;
+      transform: translateX(-50%);
+      z-index: 6;
+      display: none;
+      gap: 6px;
+      padding: 6px 8px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.18);
+      border: 1px solid rgba(255,255,255,0.22);
+    }
+    .photo-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.45);
+      border: none;
+      padding: 0;
+      cursor: pointer;
+    }
+    .photo-dot.active { background: rgba(255,255,255,0.96); }
+
+    .photo-frame.has-photos .photo-nav,
+    .photo-frame.has-photos .photo-dots { display: flex; }
+
+    .photo-frame.single-photo .photo-nav,
+    .photo-frame.single-photo .photo-dots { display: none !important; }
+
+    /* Overlay & ornaments remain (static) */
     .photo-frame .photo-overlay {position: absolute;top: 0;left: 0;right: 0;bottom: 0;background: linear-gradient(180deg,rgba(255,255,255,0.2) 0%,transparent 25%,transparent 75%,rgba(139, 115, 85, 0.15) 100%);z-index: 2;pointer-events: none;}
-    .photo-frame .corner-ornament {position: absolute;width: 20px;height: 20px;border: 2px solid #c4b5a0;z-index: 4;pointer-events: none;opacity: 0.6;}
+    .photo-frame .corner-ornament {position: absolute;width: 20px;height: 20px;border: 2px solid #c4b5a0;z-index: 7;pointer-events: none;opacity: 0.6;}
     .photo-frame .corner-ornament.top-left {top: 10px;left: 10px;border-right: none;border-bottom: none;border-radius: 5px 0 0 0;}
     .photo-frame .corner-ornament.top-right {top: 10px;right: 10px;border-left: none;border-bottom: none;border-radius: 0 5px 0 0;}
     .photo-frame .corner-ornament.bottom-left {bottom: 10px;left: 10px;border-right: none;border-top: none;border-radius: 0 0 0 5px;}
@@ -216,26 +298,27 @@
 
     /* Responsive Photo Frame */
     @media (max-width: 350px) {
-      .photo-frame {width: 220px;height: 280px;border-radius: 110px 110px 10px 10px;border-width: 4px;}
-      .photo-frame::before {top: -10px;left: -10px;right: -10px;bottom: -10px;border-radius: 120px 120px 20px 20px;}
-      .photo-placeholder svg {width: 50px;height: 50px;}
+      .photo-frame {width: 240px;height: 310px;border-radius: 120px 120px 10px 10px;border-width: 4px;}
+      .photo-frame::before {top: -10px;left: -10px;right: -10px;bottom: -10px;border-radius: 130px 130px 20px 20px;}
+      .photo-placeholder svg {width: 52px;height: 52px;}
+      .photo-nav { width: 40px; height: 40px; }
     }
     @media (min-width: 351px) and (max-width: 450px) {
-      .photo-frame {width: 250px;height: 320px;border-radius: 125px 125px 10px 10px;}
-      .photo-frame::before {border-radius: 137px 137px 22px 22px;}
+      .photo-frame {width: 270px;height: 350px;border-radius: 135px 135px 12px 12px;}
+      .photo-frame::before {border-radius: 147px 147px 24px 24px;}
     }
     @media (min-width: 500px) {
-      .photo-frame {width: 300px;height: 385px;border-radius: 150px 150px 14px 14px;}
-      .photo-frame::before {border-radius: 162px 162px 26px 26px;}
+      .photo-frame {width: 320px;height: 430px;border-radius: 160px 160px 14px 14px;}
+      .photo-frame::before {border-radius: 172px 172px 26px 26px;}
     }
     @media (min-width: 768px) {
-      .photo-frame {width: 340px;height: 435px;border-radius: 170px 170px 16px 16px;}
-      .photo-frame::before {border-radius: 182px 182px 28px 28px;}
+      .photo-frame {width: 360px;height: 470px;border-radius: 180px 180px 16px 16px;}
+      .photo-frame::before {border-radius: 192px 192px 28px 28px;}
     }
     @media (min-width: 1025px) {
-      .photo-frame {width: 380px;height: 490px;border-radius: 190px 190px 18px 18px;border-width: 6px;}
-      .photo-frame::before {top: -14px;left: -14px;right: -14px;bottom: -14px;border-radius: 204px 204px 32px 32px;}
-      .photo-placeholder svg {width: 80px;height: 80px;}
+      .photo-frame {width: 400px;height: 520px;border-radius: 200px 200px 18px 18px;border-width: 6px;}
+      .photo-frame::before {top: -14px;left: -14px;right: -14px;bottom: -14px;border-radius: 214px 214px 32px 32px;}
+      .photo-placeholder svg {width: 84px;height: 84px;}
     }
 
     .hearts-container {position: absolute;width: 100%;height: 100%;pointer-events: none;overflow: hidden;display: none;}
@@ -582,18 +665,22 @@
         mapsUrl: "https://maps.google.com/?q=Monas"
       },
       media: {
-        couplePhoto: "IMG_0252.jpg", // (opsional) foto couple di dalam undangan. Contoh: "images/couple.jpg" atau URL
+        // Foto di dalam undangan (carousel). Isi salah satu:
+        // - couplePhotos: ["images/1.jpg", "images/2.jpg"]
+        // - couplePhoto: "images/couple.jpg" (fallback lama, 1 foto)
+        couplePhotos: [],
+        couplePhoto: "", // (opsional) fallback 1 foto
 
         // ===== COVER (WELCOME PAGE) BACKGROUND PORTRAIT =====
         // Isi DI SINI untuk mengganti foto background cover (portrait lebih bagus)
         // Contoh jika file ada di repo: "images/cover-portrait.jpg"
         // Contoh jika pakai URL: "https://domain.com/foto.jpg"
-        coverBackground: "cover3.png", // Google Drive (pastikan akses: Anyone with the link)
+        coverBackground: "https://drive.google.com/uc?export=view&id=11P_eds3Fa9n8aI-632KnB7JXSJNmX6gu", // Google Drive (pastikan akses: Anyone with the link)
 
 
         // Anchor/focus gambar background. Default: "50% 12%" (top-center agak turun)
         // Tips: kalau wajah terlalu KE ATAS -> ubah jadi "50% 6%". Kalau terlalu KE BAWAH -> "50% 18%".
-        coverBackgroundPosition: "50% 0%",
+        coverBackgroundPosition: "50% 12%",
 
         // 0..1 agar teks tetap terbaca di atas foto (semakin besar semakin gelap)
         coverOverlayOpacity: 0.85,
@@ -675,7 +762,7 @@
         <circle cx="75" cy="75" r="8" fill="#8b7355" opacity="0.3"/>
       </svg>
 
-      <p class="cover-label">··—··</p>
+      <p class="cover-label">The Wedding of</p>
       <h1 class="cover-title">Our Special Day</h1>
 
       <div class="cover-names">
@@ -689,7 +776,7 @@
       <div class="cover-guest">
         Kepada Yth.<br>
         <strong id="guestName">Bapak/Ibu/Saudara/i</strong>
-        <div style="font-size:.8em; opacity:0; margin-top:6px;">(Tambahkan <code>?to=Nama%20Tamu</code> di URL untuk menyapa tamu)</div>
+        <div style="font-size:.8em; opacity:.85; margin-top:6px;">(Tambahkan <code>?to=Nama%20Tamu</code> di URL untuk menyapa tamu)</div>
       </div>
 
       <button class="open-invitation-btn" id="openBtn" type="button"><span>BUKA UNDANGAN</span></button>
@@ -734,8 +821,21 @@
       <p>Dengan memohon rahmat dan ridho Allah SWT,<br>kami bermaksud mengundang Bapak/Ibu/Saudara/i<br>untuk hadir di acara pernikahan kami:</p>
       <div class="divider"></div>
 
-      <div class="photo-frame" id="photoFrame">
-        <img id="couplePhoto" alt="Foto Couple" />
+      <div class="photo-frame" id="photoFrame" aria-label="Galeri foto pasangan">
+        <!-- Carousel (swipe kiri/kanan) -->
+        <div class="photo-carousel" id="photoCarousel" aria-roledescription="carousel" aria-label="Foto pasangan">
+          <div class="photo-carousel-inner" id="photoCarouselInner"></div>
+        </div>
+
+        <button class="photo-nav prev" id="photoPrev" type="button" aria-label="Foto sebelumnya">
+          <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <button class="photo-nav next" id="photoNext" type="button" aria-label="Foto berikutnya">
+          <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+
+        <div class="photo-dots" id="photoDots" aria-label="Indikator foto"></div>
+
         <div class="photo-overlay"></div>
 
         <div class="corner-ornament top-left"></div>
@@ -927,19 +1027,30 @@
       if (!isIOS) return;
 
       let startY = 0;
+      let startX = 0;
       document.addEventListener('touchstart', (e) => {
         if (!e.touches || !e.touches.length) return;
         startY = e.touches[0].clientY;
+        startX = e.touches[0].clientX;
       }, { passive: true });
 
       document.addEventListener('touchmove', (e) => {
-        // Jangan ganggu gesture di input/textarea/select
         const t = e.target;
+
+        // Jangan ganggu gesture di input/textarea/select
         if (t && t.closest && t.closest('input, textarea, select')) return;
 
+        // Jangan ganggu swipe horizontal carousel foto
+        if (t && t.closest && t.closest('.photo-carousel')) return;
+
         if (!e.touches || !e.touches.length) return;
+        const x = e.touches[0].clientX;
         const y = e.touches[0].clientY;
+        const dx = x - startX;
         const dy = y - startY;
+
+        // Jika gesture dominan horizontal, biarkan (untuk carousels/gestures)
+        if (Math.abs(dx) > Math.abs(dy)) return;
 
         const se = document.scrollingElement || document.documentElement;
         const atTop = se.scrollTop <= 0;
@@ -1116,17 +1227,8 @@
       src.type = "audio/mpeg";
       bgMusic.appendChild(src);
 
-      // Photo
-      if (cfg.media.couplePhoto) {
-        const img = $("#couplePhoto");
-        img.src = resolveAssetUrl(cfg.media.couplePhoto);
-        img.addEventListener("load", () => {
-          $("#photoFrame").classList.add("has-photo");
-        });
-        img.addEventListener("error", () => {
-          // keep placeholder
-        });
-      }
+      // Photo carousel
+      initPhotoCarousel();
 
       // Guest
       const guest = parseGuestName();
@@ -1432,6 +1534,123 @@
       }, 2000);
     }
 
+    // ========== Photo carousel ==========
+    function initPhotoCarousel(){
+      const frame = document.getElementById('photoFrame');
+      const carousel = document.getElementById('photoCarousel');
+      const inner = document.getElementById('photoCarouselInner');
+      const dotsWrap = document.getElementById('photoDots');
+      const prevBtn = document.getElementById('photoPrev');
+      const nextBtn = document.getElementById('photoNext');
+
+      if (!frame || !carousel || !inner || !dotsWrap || !prevBtn || !nextBtn) return;
+
+      // Build list: couplePhotos (array) or fallback couplePhoto (string)
+      let list = [];
+      if (Array.isArray(cfg.media?.couplePhotos) && cfg.media.couplePhotos.length) {
+        list = cfg.media.couplePhotos.filter(Boolean);
+      } else if (cfg.media?.couplePhoto) {
+        list = [cfg.media.couplePhoto];
+      }
+
+      // Reset
+      inner.innerHTML = '';
+      dotsWrap.innerHTML = '';
+      frame.classList.remove('has-photos', 'single-photo');
+
+      if (!list.length) {
+        return; // keep placeholder
+      }
+
+      const urls = list.map(resolveAssetUrl);
+
+      // Create slides + dots
+      const dots = [];
+      urls.forEach((url, idx) => {
+        const slide = document.createElement('div');
+        slide.className = 'photo-slide';
+        slide.setAttribute('data-index', String(idx));
+
+        const img = document.createElement('img');
+        img.alt = `Foto pasangan ${idx + 1}`;
+        img.loading = idx === 0 ? 'eager' : 'lazy';
+        img.decoding = 'async';
+        img.referrerPolicy = 'no-referrer';
+        img.src = url;
+
+        slide.appendChild(img);
+        inner.appendChild(slide);
+
+        const dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'photo-dot' + (idx === 0 ? ' active' : '');
+        dot.setAttribute('aria-label', `Buka foto ${idx + 1}`);
+        dot.addEventListener('click', () => scrollToIndex(idx));
+        dotsWrap.appendChild(dot);
+        dots.push(dot);
+      });
+
+      frame.classList.add('has-photos');
+      if (urls.length === 1) frame.classList.add('single-photo');
+
+      function scrollToIndex(idx){
+        const w = carousel.clientWidth;
+        carousel.scrollTo({ left: w * idx, behavior: 'smooth' });
+      }
+
+      function getActiveIndex(){
+        const w = carousel.clientWidth || 1;
+        return Math.round(carousel.scrollLeft / w);
+      }
+
+      function updateDots(){
+        const idx = Math.max(0, Math.min(urls.length - 1, getActiveIndex()));
+        dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+      }
+
+      // Prev/next
+      prevBtn.onclick = () => scrollToIndex(Math.max(0, getActiveIndex() - 1));
+      nextBtn.onclick = () => scrollToIndex(Math.min(urls.length - 1, getActiveIndex() + 1));
+
+      // Update dots on scroll (throttled)
+      let raf = 0;
+      carousel.addEventListener('scroll', () => {
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(updateDots);
+      }, { passive: true });
+
+      // Ensure start at 0
+      requestAnimationFrame(() => {
+        carousel.scrollLeft = 0;
+        updateDots();
+      });
+
+      // Error handling: if all fail, show placeholder
+      const imgs = inner.querySelectorAll('img');
+      let okCount = 0;
+      let doneCount = 0;
+      imgs.forEach(im => {
+        im.addEventListener('load', () => {
+          okCount++;
+          doneCount++;
+        });
+        im.addEventListener('error', () => {
+          doneCount++;
+          // Hide broken image slide
+          im.closest('.photo-slide')?.remove();
+        });
+      });
+
+      // After a short delay, decide if nothing loaded
+      setTimeout(() => {
+        const remaining = inner.querySelectorAll('img').length;
+        if (!remaining) {
+          frame.classList.remove('has-photos', 'single-photo');
+          toast('Foto couple tidak bisa dimuat. Cek path/izin file.');
+        }
+      }, 2500);
+    }
+
     // ========== Cover open ==========
     function initCoverOpen(){
       const openBtn = document.getElementById('openBtn');
@@ -1464,20 +1683,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
