@@ -147,10 +147,20 @@
 
     /* ========== WINDOW STYLE PHOTO FRAME (ARCH TOP) ========== */
     /* Frame “jendela antik” + carousel (geser kiri/kanan). Animasi di dalam frame DISABLE sesuai request. */
+
+    /* Wrapper supaya tombol bisa di luar frame (tidak ke-clip oleh overflow:hidden) */
+    .photo-frame-wrap{
+      position: relative;
+      width: max-content;
+      max-width: 100%;
+      margin: 35px auto;
+      padding: 0 64px; /* space for outside nav buttons */
+    }
+
     .photo-frame {
       width: 300px;
       height: 400px;
-      margin: 35px auto;
+      margin: 0;
       border-radius: 150px 150px 14px 14px;
       border: 5px solid #d4cfc4;
       overflow: hidden;
@@ -236,7 +246,7 @@
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      z-index: 6;
+      z-index: 10;
       width: 44px;
       height: 44px;
       border-radius: 999px;
@@ -250,9 +260,13 @@
       touch-action: manipulation;
     }
     .photo-nav svg { width: 22px; height: 22px; fill: none; stroke: rgba(255,255,255,0.95); stroke-width: 2.5; }
-    .photo-nav.prev { left: 10px; }
-    .photo-nav.next { right: 10px; }
+
+    /* tombol berada DI LUAR frame */
+    .photo-nav.prev { left: -56px; }
+    .photo-nav.next { right: -56px; }
+
     .photo-nav:active { transform: translateY(-50%) scale(0.96); }
+    .photo-nav:focus-visible { outline: 2px solid rgba(255,255,255,0.75); outline-offset: 3px; }
 
     .photo-dots {
       position: absolute;
@@ -278,10 +292,11 @@
     }
     .photo-dot.active { background: rgba(255,255,255,0.96); }
 
-    .photo-frame.has-photos .photo-nav,
+    /* show/hide controller */
+    .photo-frame-wrap.has-photos .photo-nav { display: flex; }
     .photo-frame.has-photos .photo-dots { display: flex; }
 
-    .photo-frame.single-photo .photo-nav,
+    .photo-frame-wrap.single-photo .photo-nav,
     .photo-frame.single-photo .photo-dots { display: none !important; }
 
     /* Overlay & ornaments remain (static) */
@@ -302,23 +317,34 @@
       .photo-frame::before {top: -10px;left: -10px;right: -10px;bottom: -10px;border-radius: 130px 130px 20px 20px;}
       .photo-placeholder svg {width: 52px;height: 52px;}
       .photo-nav { width: 40px; height: 40px; }
+      .photo-nav.prev { left: -46px; }
+      .photo-nav.next { right: -46px; }
+      .photo-frame-wrap { padding: 0 52px; }
     }
     @media (min-width: 351px) and (max-width: 450px) {
       .photo-frame {width: 270px;height: 350px;border-radius: 135px 135px 12px 12px;}
       .photo-frame::before {border-radius: 147px 147px 24px 24px;}
+      .photo-nav.prev { left: -54px; }
+      .photo-nav.next { right: -54px; }
     }
     @media (min-width: 500px) {
       .photo-frame {width: 320px;height: 430px;border-radius: 160px 160px 14px 14px;}
       .photo-frame::before {border-radius: 172px 172px 26px 26px;}
+      .photo-nav.prev { left: -60px; }
+      .photo-nav.next { right: -60px; }
     }
     @media (min-width: 768px) {
       .photo-frame {width: 360px;height: 470px;border-radius: 180px 180px 16px 16px;}
       .photo-frame::before {border-radius: 192px 192px 28px 28px;}
+      .photo-nav.prev { left: -66px; }
+      .photo-nav.next { right: -66px; }
     }
     @media (min-width: 1025px) {
       .photo-frame {width: 400px;height: 520px;border-radius: 200px 200px 18px 18px;border-width: 6px;}
       .photo-frame::before {top: -14px;left: -14px;right: -14px;bottom: -14px;border-radius: 214px 214px 32px 32px;}
       .photo-placeholder svg {width: 84px;height: 84px;}
+      .photo-nav.prev { left: -74px; }
+      .photo-nav.next { right: -74px; }
     }
 
     .hearts-container {position: absolute;width: 100%;height: 100%;pointer-events: none;overflow: hidden;display: none;}
@@ -680,7 +706,7 @@
 
         // Anchor/focus gambar background. Default: "50% 12%" (top-center agak turun)
         // Tips: kalau wajah terlalu KE ATAS -> ubah jadi "50% 6%". Kalau terlalu KE BAWAH -> "50% 18%".
-        coverBackgroundPosition: "50% 12%",
+        coverBackgroundPosition: "50% 0%",
 
         // 0..1 agar teks tetap terbaca di atas foto (semakin besar semakin gelap)
         coverOverlayOpacity: 0.85,
@@ -826,12 +852,7 @@
       <p>Dengan memohon rahmat dan ridho Allah SWT,<br>kami bermaksud mengundang Bapak/Ibu/Saudara/i<br>untuk hadir di acara pernikahan kami:</p>
       <div class="divider"></div>
 
-      <div class="photo-frame" id="photoFrame" aria-label="Galeri foto pasangan">
-        <!-- Carousel (swipe kiri/kanan) -->
-        <div class="photo-carousel" id="photoCarousel" aria-roledescription="carousel" aria-label="Foto pasangan">
-          <div class="photo-carousel-inner" id="photoCarouselInner"></div>
-        </div>
-
+      <div class="photo-frame-wrap" id="photoFrameWrap">
         <button class="photo-nav prev" id="photoPrev" type="button" aria-label="Foto sebelumnya">
           <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
@@ -839,18 +860,25 @@
           <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
         </button>
 
-        <div class="photo-dots" id="photoDots" aria-label="Indikator foto"></div>
+        <div class="photo-frame" id="photoFrame" aria-label="Galeri foto pasangan">
+          <!-- Carousel (swipe kiri/kanan) -->
+          <div class="photo-carousel" id="photoCarousel" aria-roledescription="carousel" aria-label="Foto pasangan">
+            <div class="photo-carousel-inner" id="photoCarouselInner"></div>
+          </div>
 
-        <div class="photo-overlay"></div>
+          <div class="photo-dots" id="photoDots" aria-label="Indikator foto"></div>
 
-        <div class="corner-ornament top-left"></div>
-        <div class="corner-ornament top-right"></div>
-        <div class="corner-ornament bottom-left"></div>
-        <div class="corner-ornament bottom-right"></div>
+          <div class="photo-overlay"></div>
 
-        <div class="photo-placeholder" id="photoPlaceholder">
-          <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-          <span>Foto Couple</span>
+          <div class="corner-ornament top-left"></div>
+          <div class="corner-ornament top-right"></div>
+          <div class="corner-ornament bottom-left"></div>
+          <div class="corner-ornament bottom-right"></div>
+
+          <div class="photo-placeholder" id="photoPlaceholder">
+            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+            <span>Foto Couple</span>
+          </div>
         </div>
       </div>
 
@@ -1553,6 +1581,7 @@
 
     // ========== Photo carousel ==========
     function initPhotoCarousel(){
+      const wrap = document.getElementById('photoFrameWrap');
       const frame = document.getElementById('photoFrame');
       const carousel = document.getElementById('photoCarousel');
       const inner = document.getElementById('photoCarouselInner');
@@ -1560,7 +1589,7 @@
       const prevBtn = document.getElementById('photoPrev');
       const nextBtn = document.getElementById('photoNext');
 
-      if (!frame || !carousel || !inner || !dotsWrap || !prevBtn || !nextBtn) return;
+      if (!wrap || !frame || !carousel || !inner || !dotsWrap || !prevBtn || !nextBtn) return;
 
       // Build list: couplePhotos (array) or fallback couplePhoto (string)
       let list = [];
@@ -1574,6 +1603,7 @@
       inner.innerHTML = '';
       dotsWrap.innerHTML = '';
       frame.classList.remove('has-photos', 'single-photo');
+      wrap.classList.remove('has-photos', 'single-photo');
 
       if (!list.length) {
         return; // keep placeholder
@@ -1581,91 +1611,160 @@
 
       const urls = list.map(resolveAssetUrl);
 
-      // Create slides + dots
+      // Single photo: render normal without loop clones
+      const enableLoop = urls.length > 1;
+
+      // Build slides (with clones for loop)
+      const realCount = urls.length;
+      const slidesForRender = enableLoop
+        ? [urls[realCount - 1], ...urls, urls[0]]
+        : urls;
+
+      // Dots for real slides only
       const dots = [];
-      urls.forEach((url, idx) => {
+      for (let i = 0; i < realCount; i++) {
+        const dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'photo-dot' + (i === 0 ? ' active' : '');
+        dot.setAttribute('aria-label', `Buka foto ${i + 1}`);
+        dot.addEventListener('click', () => scrollToRealIndex(i));
+        dotsWrap.appendChild(dot);
+        dots.push(dot);
+      }
+
+      slidesForRender.forEach((url, idx) => {
         const slide = document.createElement('div');
         slide.className = 'photo-slide';
-        slide.setAttribute('data-index', String(idx));
+        slide.setAttribute('data-render-index', String(idx));
 
         const img = document.createElement('img');
-        img.alt = `Foto pasangan ${idx + 1}`;
-        img.loading = idx === 0 ? 'eager' : 'lazy';
+        // For accessibility, map to the closest real index
+        const realIdx = enableLoop ? ((idx - 1 + realCount) % realCount) : idx;
+        img.alt = `Foto pasangan ${realIdx + 1}`;
+        img.loading = idx <= 1 ? 'eager' : 'lazy';
         img.decoding = 'async';
         img.referrerPolicy = 'no-referrer';
         img.src = url;
 
         slide.appendChild(img);
         inner.appendChild(slide);
-
-        const dot = document.createElement('button');
-        dot.type = 'button';
-        dot.className = 'photo-dot' + (idx === 0 ? ' active' : '');
-        dot.setAttribute('aria-label', `Buka foto ${idx + 1}`);
-        dot.addEventListener('click', () => scrollToIndex(idx));
-        dotsWrap.appendChild(dot);
-        dots.push(dot);
       });
 
       frame.classList.add('has-photos');
-      if (urls.length === 1) frame.classList.add('single-photo');
-
-      function scrollToIndex(idx){
-        const w = carousel.clientWidth;
-        carousel.scrollTo({ left: w * idx, behavior: 'smooth' });
+      wrap.classList.add('has-photos');
+      if (!enableLoop) {
+        frame.classList.add('single-photo');
+        wrap.classList.add('single-photo');
       }
 
-      function getActiveIndex(){
-        const w = carousel.clientWidth || 1;
-        return Math.round(carousel.scrollLeft / w);
+      function slideWidth(){
+        return carousel.clientWidth || 1;
       }
 
-      function updateDots(){
-        const idx = Math.max(0, Math.min(urls.length - 1, getActiveIndex()));
-        dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+      function goToRenderIndex(renderIdx, behavior = 'smooth'){
+        carousel.scrollTo({ left: slideWidth() * renderIdx, behavior });
       }
 
-      // Prev/next
-      prevBtn.onclick = () => scrollToIndex(Math.max(0, getActiveIndex() - 1));
-      nextBtn.onclick = () => scrollToIndex(Math.min(urls.length - 1, getActiveIndex() + 1));
+      function getRenderIndex(){
+        return Math.round(carousel.scrollLeft / slideWidth());
+      }
 
-      // Update dots on scroll (throttled)
+      // Real index: 0..realCount-1
+      function renderIndexToRealIndex(renderIdx){
+        if (!enableLoop) return Math.max(0, Math.min(realCount - 1, renderIdx));
+        // render: 0 = clone(last), 1..realCount = real, last = clone(first)
+        if (renderIdx === 0) return realCount - 1;
+        if (renderIdx === realCount + 1) return 0;
+        return renderIdx - 1;
+      }
+
+      function scrollToRealIndex(realIdx){
+        if (!enableLoop) return goToRenderIndex(realIdx, 'smooth');
+        goToRenderIndex(realIdx + 1, 'smooth');
+      }
+
+      function setActiveDot(realIdx){
+        dots.forEach((d, i) => d.classList.toggle('active', i === realIdx));
+      }
+
+      // Prev/next with infinite looping
+      prevBtn.onclick = () => {
+        const ri = getRenderIndex();
+        goToRenderIndex(ri - 1, 'smooth');
+      };
+      nextBtn.onclick = () => {
+        const ri = getRenderIndex();
+        goToRenderIndex(ri + 1, 'smooth');
+      };
+
+      // Keep dots in sync + handle loop jump (when reaching clones)
       let raf = 0;
-      carousel.addEventListener('scroll', () => {
+      const onScroll = () => {
         cancelAnimationFrame(raf);
-        raf = requestAnimationFrame(updateDots);
-      }, { passive: true });
+        raf = requestAnimationFrame(() => {
+          const ri = getRenderIndex();
+          const realIdx = renderIndexToRealIndex(ri);
+          setActiveDot(realIdx);
 
-      // Ensure start at 0
+          if (!enableLoop) return;
+
+          // Jump without animation if we are on clones
+          if (ri === 0) {
+            // at clone(last) -> jump to real last
+            requestAnimationFrame(() => {
+              goToRenderIndex(realCount, 'auto');
+            });
+          } else if (ri === realCount + 1) {
+            // at clone(first) -> jump to real first
+            requestAnimationFrame(() => {
+              goToRenderIndex(1, 'auto');
+            });
+          }
+        });
+      };
+
+      carousel.addEventListener('scroll', onScroll, { passive: true });
+
+      // Init position
       requestAnimationFrame(() => {
-        carousel.scrollLeft = 0;
-        updateDots();
+        if (enableLoop) {
+          goToRenderIndex(1, 'auto');
+          setActiveDot(0);
+        } else {
+          goToRenderIndex(0, 'auto');
+          setActiveDot(0);
+        }
       });
 
-      // Error handling: if fail, mark slide as broken (do not remove -> keep dots/index stable)
+      // Error handling: if fail, mark slide as broken (do not remove -> keep indexes stable)
       const imgs = inner.querySelectorAll('img');
       let okCount = 0;
-      let doneCount = 0;
       imgs.forEach(im => {
-        im.addEventListener('load', () => {
-          okCount++;
-          doneCount++;
-        });
+        im.addEventListener('load', () => { okCount++; });
         im.addEventListener('error', () => {
-          doneCount++;
           const slide = im.closest('.photo-slide');
           if (slide) slide.classList.add('broken');
           console.warn('Couple photo failed to load:', im.src);
         });
       });
 
-      // After a short delay, decide if nothing loaded
       setTimeout(() => {
         if (okCount === 0) {
           frame.classList.remove('has-photos', 'single-photo');
+          wrap.classList.remove('has-photos', 'single-photo');
           toast('Foto couple tidak bisa dimuat. Pastikan path benar & case-sensitive (mis. images/Foto.jpg ≠ images/foto.jpg).');
         }
       }, 2500);
+
+      // Re-align on resize (orientation change etc.)
+      let lastW = slideWidth();
+      window.addEventListener('resize', () => {
+        const w = slideWidth();
+        if (Math.abs(w - lastW) < 10) return;
+        lastW = w;
+        const ri = getRenderIndex();
+        goToRenderIndex(ri, 'auto');
+      });
     }
 
     // ========== Cover open ==========
