@@ -206,7 +206,8 @@
       overflow-y: hidden;
       scroll-snap-type: x mandatory;
       -webkit-overflow-scrolling: touch;
-      scroll-behavior: smooth;
+      /* Penting untuk infinite loop: jump dari clone -> slide asli harus instan (tanpa animasi balik). */
+      scroll-behavior: auto;
       scrollbar-width: none;
       touch-action: pan-x;
     }
@@ -714,7 +715,7 @@
 
         // Anchor/focus gambar background. Default: "50% 12%" (top-center agak turun)
         // Tips: kalau wajah terlalu KE ATAS -> ubah jadi "50% 6%". Kalau terlalu KE BAWAH -> "50% 18%".
-        coverBackgroundPosition: "50% 0%",
+        coverBackgroundPosition: "50% 12%",
 
         // 0..1 agar teks tetap terbaca di atas foto (semakin besar semakin gelap)
         coverOverlayOpacity: 0.85,
@@ -1856,4 +1857,3 @@
   </script>
 </body>
 </html>
-
