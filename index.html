@@ -154,7 +154,15 @@
       width: max-content;
       max-width: 100%;
       margin: 35px auto;
-      padding: 0 64px; /* space for outside nav buttons */
+
+      /* Tombol di luar frame, tapi dekat tepi frame (responsif via CSS vars) */
+      --nav-size: 44px;
+      --nav-gap: 8px;  /* jarak tombol ke tepi frame */
+      --nav-pad: 6px;  /* jarak tombol ke tepi wrapper */
+      --nav-space: calc(var(--nav-size) + var(--nav-gap) + var(--nav-pad));
+
+      /* ruang di kiri/kanan agar tombol tidak menimpa frame */
+      padding: 0 var(--nav-space);
     }
 
     .photo-frame {
@@ -261,11 +269,13 @@
     }
     .photo-nav svg { width: 22px; height: 22px; fill: none; stroke: rgba(255,255,255,0.95); stroke-width: 2.5; }
 
-    /* tombol berada DI LUAR frame */
-    .photo-nav.prev { left: -56px; }
-    .photo-nav.next { right: -56px; }
+    /* tombol berada DI LUAR frame (lebih dekat dengan tepi frame) */
+    .photo-nav { width: var(--nav-size); height: var(--nav-size); }
+    .photo-nav.prev { left: var(--nav-pad); }
+    .photo-nav.next { right: var(--nav-pad); }
 
     .photo-nav:active { transform: translateY(-50%) scale(0.96); }
+    .photo-nav:hover { background: rgba(0,0,0,0.32); }
     .photo-nav:focus-visible { outline: 2px solid rgba(255,255,255,0.75); outline-offset: 3px; }
 
     .photo-dots {
@@ -316,35 +326,33 @@
       .photo-frame {width: 240px;height: 310px;border-radius: 120px 120px 10px 10px;border-width: 4px;}
       .photo-frame::before {top: -10px;left: -10px;right: -10px;bottom: -10px;border-radius: 130px 130px 20px 20px;}
       .photo-placeholder svg {width: 52px;height: 52px;}
-      .photo-nav { width: 40px; height: 40px; }
-      .photo-nav.prev { left: -46px; }
-      .photo-nav.next { right: -46px; }
-      .photo-frame-wrap { padding: 0 52px; }
+
+      .photo-frame-wrap{ --nav-size: 40px; --nav-gap: 6px; --nav-pad: 6px; }
     }
     @media (min-width: 351px) and (max-width: 450px) {
       .photo-frame {width: 270px;height: 350px;border-radius: 135px 135px 12px 12px;}
       .photo-frame::before {border-radius: 147px 147px 24px 24px;}
-      .photo-nav.prev { left: -54px; }
-      .photo-nav.next { right: -54px; }
+
+      .photo-frame-wrap{ --nav-size: 44px; --nav-gap: 8px; --nav-pad: 8px; }
     }
     @media (min-width: 500px) {
       .photo-frame {width: 320px;height: 430px;border-radius: 160px 160px 14px 14px;}
       .photo-frame::before {border-radius: 172px 172px 26px 26px;}
-      .photo-nav.prev { left: -60px; }
-      .photo-nav.next { right: -60px; }
+
+      .photo-frame-wrap{ --nav-size: 46px; --nav-gap: 10px; --nav-pad: 10px; }
     }
     @media (min-width: 768px) {
       .photo-frame {width: 360px;height: 470px;border-radius: 180px 180px 16px 16px;}
       .photo-frame::before {border-radius: 192px 192px 28px 28px;}
-      .photo-nav.prev { left: -66px; }
-      .photo-nav.next { right: -66px; }
+
+      .photo-frame-wrap{ --nav-size: 48px; --nav-gap: 12px; --nav-pad: 12px; }
     }
     @media (min-width: 1025px) {
       .photo-frame {width: 400px;height: 520px;border-radius: 200px 200px 18px 18px;border-width: 6px;}
       .photo-frame::before {top: -14px;left: -14px;right: -14px;bottom: -14px;border-radius: 214px 214px 32px 32px;}
       .photo-placeholder svg {width: 84px;height: 84px;}
-      .photo-nav.prev { left: -74px; }
-      .photo-nav.next { right: -74px; }
+
+      .photo-frame-wrap{ --nav-size: 52px; --nav-gap: 14px; --nav-pad: 14px; }
     }
 
     .hearts-container {position: absolute;width: 100%;height: 100%;pointer-events: none;overflow: hidden;display: none;}
