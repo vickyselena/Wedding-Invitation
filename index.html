@@ -18,6 +18,10 @@
   <!-- Tailwind CDN (required) -->
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
+  <!-- Firebase (Realtime Database) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+
   <link href="https://fonts.googleapis.com/css2?family=Italiana&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Spectral:ital,wght@0,300;0,400;0,500;1,300&family=Poppins:wght@200;300;400;500&family=Raleway:wght@200;300;400;500&display=swap" rel="stylesheet" />
 
   <style>
@@ -155,11 +159,10 @@
       max-width: 100%;
       margin: 35px auto;
 
-      /* Tombol di luar frame, tapi dekat tepi frame (responsif via CSS vars) */
+      /* Tombol berada di luar frame, dekat tepi frame, dan SIMETRIS kiri/kanan */
       --nav-size: 44px;
       --nav-gap: 8px;  /* jarak tombol ke tepi frame */
-      --nav-pad: 6px;  /* jarak tombol ke tepi wrapper */
-      --nav-space: calc(var(--nav-size) + var(--nav-gap) + var(--nav-pad));
+      --nav-space: calc(var(--nav-size) + var(--nav-gap));
 
       /* ruang di kiri/kanan agar tombol tidak menimpa frame */
       padding: 0 var(--nav-space);
@@ -272,8 +275,10 @@
 
     /* tombol berada DI LUAR frame (lebih dekat dengan tepi frame) */
     .photo-nav { width: var(--nav-size); height: var(--nav-size); }
-    .photo-nav.prev { left: var(--nav-pad); }
-    .photo-nav.next { right: var(--nav-pad); }
+    /* tombol pas di luar frame: wrapper punya padding kiri/kanan = --nav-space,
+       jadi tempelkan tombol ke tepi wrapper. Jarak tombol ke frame = --nav-gap (simetris). */
+    .photo-nav.prev { left: 0; }
+    .photo-nav.next { right: 0; }
 
     .photo-nav:active { transform: translateY(-50%) scale(0.96); }
     .photo-nav:hover { background: rgba(0,0,0,0.32); }
@@ -328,32 +333,32 @@
       .photo-frame::before {top: -10px;left: -10px;right: -10px;bottom: -10px;border-radius: 130px 130px 20px 20px;}
       .photo-placeholder svg {width: 52px;height: 52px;}
 
-      .photo-frame-wrap{ --nav-size: 40px; --nav-gap: 6px; --nav-pad: 6px; }
+      .photo-frame-wrap{ --nav-size: 40px; --nav-gap: 6px; }
     }
     @media (min-width: 351px) and (max-width: 450px) {
       .photo-frame {width: 270px;height: 350px;border-radius: 135px 135px 12px 12px;}
       .photo-frame::before {border-radius: 147px 147px 24px 24px;}
 
-      .photo-frame-wrap{ --nav-size: 44px; --nav-gap: 8px; --nav-pad: 8px; }
+      .photo-frame-wrap{ --nav-size: 44px; --nav-gap: 6px; }
     }
     @media (min-width: 500px) {
       .photo-frame {width: 320px;height: 430px;border-radius: 160px 160px 14px 14px;}
       .photo-frame::before {border-radius: 172px 172px 26px 26px;}
 
-      .photo-frame-wrap{ --nav-size: 46px; --nav-gap: 10px; --nav-pad: 10px; }
+      .photo-frame-wrap{ --nav-size: 46px; --nav-gap: 8px; }
     }
     @media (min-width: 768px) {
       .photo-frame {width: 360px;height: 470px;border-radius: 180px 180px 16px 16px;}
       .photo-frame::before {border-radius: 192px 192px 28px 28px;}
 
-      .photo-frame-wrap{ --nav-size: 48px; --nav-gap: 12px; --nav-pad: 12px; }
+      .photo-frame-wrap{ --nav-size: 48px; --nav-gap: 10px; }
     }
     @media (min-width: 1025px) {
       .photo-frame {width: 400px;height: 520px;border-radius: 200px 200px 18px 18px;border-width: 6px;}
       .photo-frame::before {top: -14px;left: -14px;right: -14px;bottom: -14px;border-radius: 214px 214px 32px 32px;}
       .photo-placeholder svg {width: 84px;height: 84px;}
 
-      .photo-frame-wrap{ --nav-size: 52px; --nav-gap: 14px; --nav-pad: 14px; }
+      .photo-frame-wrap{ --nav-size: 52px; --nav-gap: 12px; }
     }
 
     .hearts-container {position: absolute;width: 100%;height: 100%;pointer-events: none;overflow: hidden;display: none;}
@@ -434,7 +439,96 @@
     .badge-hadir {background: rgba(46, 204, 113, .12);border: 1px solid rgba(46, 204, 113, .25);color: #1f7a44;}
     .badge-tidak {background: rgba(231, 76, 60, .10);border: 1px solid rgba(231, 76, 60, .20);color: #9b2c23;}
     .badge-ragu {background: rgba(243, 156, 18, .10);border: 1px solid rgba(243, 156, 18, .20);color: #8b5a00;}
+    /* Optimistic UI status badge */
+    .badge-pending {background: rgba(255,255,255,0.14);border: 1px solid rgba(255,255,255,0.26);color: rgba(255,255,255,0.98);}
+    .badge-offline {background: rgba(255,255,255,0.10);border: 1px solid rgba(255,255,255,0.22);color: rgba(255,255,255,0.98);}
+    .badge-sent {background: rgba(255,255,255,0.12);border: 1px solid rgba(255,255,255,0.22);color: rgba(255,255,255,0.98);}
     .rsvp-item .msg {margin-top: 8px;font-size: .9em;color:#6b6b6b;line-height: 1.6;}
+
+    /* ===== RSVP list: pastikan selalu nyaman terlihat di semua HP ===== */
+    .rsvp-list { display: block; }
+
+    /* Kontras lebih jelas di background coral */
+    .rsvp-item { box-shadow: 0 8px 22px rgba(0,0,0,0.08); }
+
+    /* Pagination controls */
+    .rsvp-pagination {
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+    .pagination-info {
+      font-size: 0.8em;
+      color: var(--text-muted);
+      font-family: 'Poppins', sans-serif;
+    }
+    .pagination-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .pagination-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 18px;
+      background: var(--glass);
+      border: 1px solid var(--stroke);
+      border-radius: 999px;
+      color: var(--text-main);
+      font-family: 'Raleway', sans-serif;
+      font-size: 0.8em;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .pagination-btn:hover:not(:disabled) {
+      background: var(--glass-strong);
+    }
+    .pagination-btn:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+    .pagination-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .pagination-btn svg {
+      flex-shrink: 0;
+    }
+    .pagination-select {
+      padding: 10px 36px 10px 14px;
+      background-color: var(--glass);
+      border: 1px solid var(--stroke);
+      border-radius: 999px;
+      color: var(--text-main);
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.85em;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 10px 10px;
+    }
+    .pagination-select option {
+      color: #111;
+      background: #fff;
+    }
+    .pagination-select:focus {
+      outline: none;
+      border-color: rgba(255,255,255,0.55);
+    }
+
+    /* Layout item lebih aman di layar kecil (badge tidak “lari” sendiri) */
+    @media (max-width: 420px) {
+      .rsvp-list > div:first-child { flex-wrap: wrap; }
+      .rsvp-item .top { flex-direction: column; align-items: flex-start; }
+      .rsvp-item .badge { align-self: flex-start; }
+    }
 
     /* Gift Section */
     .gift-section {padding: 60px 20px;text-align: center;background: white;position: relative;}
@@ -590,23 +684,41 @@
     }
 
     .rsvp-form input,
-    .rsvp-form select,
     .rsvp-form textarea {
-      background: var(--glass);
+      background-color: var(--glass);
       border-color: var(--stroke);
       color: var(--text-main);
     }
     .rsvp-form input::placeholder,
     .rsvp-form textarea::placeholder { color: var(--text-soft); }
+
+    /* Penting: jangan pakai shorthand `background:` untuk select,
+       karena itu bisa me-reset background-repeat/position dan membuat ikon panah "menutupi" area. */
     .rsvp-form select {
+      background-color: var(--glass);
+      border-color: var(--stroke);
+      color: var(--text-main);
+
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 15px center;
+      background-size: 12px 12px;
+      padding-right: 44px;
     }
+
     .rsvp-form input:focus,
     .rsvp-form select:focus,
     .rsvp-form textarea:focus {
       border-color: rgba(255,255,255,0.55);
-      background: var(--glass-strong);
+      background-color: var(--glass-strong);
       box-shadow: 0 6px 16px rgba(0,0,0,0.16);
+    }
+
+    /* Dropdown list (option) rendering berbeda-beda tiap browser;
+       set warna aman agar tidak terlihat seperti block besar. */
+    .rsvp-form select option {
+      color: #111;
+      background: #fff;
     }
 
     .rsvp-item {
@@ -617,7 +729,7 @@
     .rsvp-item .name, .rsvp-item .msg, .rsvp-item .meta { color: var(--text-main); }
 
     /* Badge text forced white */
-    .badge-hadir, .badge-tidak, .badge-ragu { color: rgba(255,255,255,0.98); }
+    .badge-hadir, .badge-tidak, .badge-ragu, .badge-pending, .badge-offline, .badge-sent { color: rgba(255,255,255,0.98); }
 
     .gift-note {
       background: var(--glass);
@@ -695,27 +807,31 @@
         dayName: "Sabtu",
         dateLong: "07 Februari 2026",
         time: "Pukul 14.00 WIB - Selesai",
-        venueName: "Gedung Pernikahan",
-        venueAddressHtml: "Jl. Contoh No. 123<br>Jakarta Selatan, DKI Jakarta",
-        mapsUrl: "https://maps.google.com/?q=Monas"
+        venueName: "Rumah Mempelai Wanita",
+        venueAddressHtml: "Jogoloyo Gg Besar A No.12, RT.04 RW.03<br>Kel. Gunungsari, Kec. Dukuh Pakis<br>Surabaya, Kode POS 60224",
+        mapsUrl: "https://maps.app.goo.gl/ktN8RKhNBisQoAza6",
+        mapsLat: -7.305380,
+        mapsLng: 112.713539
       },
       media: {
         // Foto di dalam undangan (carousel). Isi salah satu:
         // - couplePhotos: ["images/1.jpg", "images/2.jpg"]
         // - couplePhoto: "images/couple.jpg" (fallback lama, 1 foto)
-        couplePhotos: ["foto1.jpg", "foto2.jpg", "cover1.png"],
+        couplePhotos: [
+          "galeri1.jpg","galeri2.jpg","galeri3.jpg","galeri4.jpg","galeri5.jpg","galeri6.jpg","galeri7.jpg"
+        ],
         couplePhoto: "", // (opsional) fallback 1 foto
 
         // ===== COVER (WELCOME PAGE) BACKGROUND PORTRAIT =====
         // Isi DI SINI untuk mengganti foto background cover (portrait lebih bagus)
         // Contoh jika file ada di repo: "images/cover-portrait.jpg"
         // Contoh jika pakai URL: "https://domain.com/foto.jpg"
-        coverBackground: "cover.jpg", // Google Drive (pastikan akses: Anyone with the link)
+        coverBackground: "cover2.png", // Google Drive (pastikan akses: Anyone with the link)
 
 
         // Anchor/focus gambar background. Default: "50% 12%" (top-center agak turun)
         // Tips: kalau wajah terlalu KE ATAS -> ubah jadi "50% 6%". Kalau terlalu KE BAWAH -> "50% 18%".
-        coverBackgroundPosition: "55% 0%",
+        coverBackgroundPosition: "50% 12%",
 
         // 0..1 agar teks tetap terbaca di atas foto (semakin besar semakin gelap)
         coverOverlayOpacity: 0.85,
@@ -733,6 +849,28 @@
           { bank: "BCA", name: "Nama Penerima 1", number: "1234567890123456" },
           { bank: "BCA", name: "Nama Penerima 2", number: "9876543210987654" }
         ]
+      },
+      firebase: {
+        enabled: true,
+        // Realtime Database config
+        // Catatan: pastikan Realtime Database Rules mengizinkan read/write untuk path ini
+        // (atau gunakan Auth jika ingin private).
+        config: {
+          apiKey: "AIzaSyCXk2rKN2XtLQpDO8aGWj-tfgFwGXYq2Ao",
+          authDomain: "project1-ed0d1.firebaseapp.com",
+          databaseURL: "https://project1-ed0d1-default-rtdb.asia-southeast1.firebasedatabase.app",
+          projectId: "project1-ed0d1",
+          storageBucket: "project1-ed0d1.firebasestorage.app",
+          messagingSenderId: "371384628609",
+          appId: "1:371384628609:web:11cdf5a78e4f47c81ea480"
+        },
+        // Path di Realtime Database untuk menyimpan RSVP/ucapan
+        // Contoh hasil: /rsvpMessages/{pushId}
+        rsvpPath: "rsvpMessages",
+        // Limit ucapan yang ditampilkan
+        listLimit: 10,
+        // Limit untuk export CSV (ambil data terbaru)
+        exportLimit: 500
       }
     };
 
@@ -964,13 +1102,28 @@
       <div class="rsvp-note" id="rsvpNotice"></div>
 
       <div class="rsvp-list" id="rsvpListWrap">
-        <div style="display:flex; align-items:center; justify-content: space-between; gap: 10px;">
-          <h4>Ucapan Terakhir</h4>
-          <button type="button" id="exportRsvp" class="secondary-btn" style="margin-top:0; padding: 10px 16px;">Export CSV</button>
-        </div>
+        <h4>Ucapan Terakhir</h4>
         <div id="rsvpList"></div>
-        <div style="text-align:center; margin-top: 12px;">
-          <button type="button" id="clearRsvp" class="secondary-btn">Reset RSVP (Perangkat ini)</button>
+        <div id="rsvpPagination" class="rsvp-pagination" style="display:none;">
+          <div class="pagination-info">
+            <span id="rsvpPageInfo">Halaman 1 dari 1</span>
+          </div>
+          <div class="pagination-controls">
+            <button type="button" id="rsvpPrevBtn" class="pagination-btn" disabled>
+              <svg viewBox="0 0 24 24" width="16" height="16"><path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+              Back
+            </button>
+            <select id="rsvpPerPage" class="pagination-select">
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+              <option value="20">20</option>
+            </select>
+            <button type="button" id="rsvpNextBtn" class="pagination-btn">
+              Next
+              <svg viewBox="0 0 24 24" width="16" height="16"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1260,15 +1413,37 @@
       // Map embed (best-effort)
       const embed = $("#mapEmbed");
       try {
-        const mapsUrl = cfg.event.mapsUrl;
+        const mapsUrl = String(cfg.event.mapsUrl || "");
         let embedUrl = mapsUrl;
-        if (mapsUrl.includes("google.com/maps") || mapsUrl.includes("maps.google")) {
-          const u = new URL(mapsUrl);
-          u.searchParams.set("output", "embed");
-          embedUrl = u.toString();
+
+        const addressText = String(cfg.event.venueAddressHtml || "")
+          .replace(/<br>/g, ", ")
+          .replace(/<[^>]*>/g, "")
+          .trim();
+        const qText = `${cfg.event.venueName} ${addressText}`.trim();
+
+        // Jika koordinat ada, prioritaskan koordinat agar pin tepat.
+        const lat = Number(cfg.event.mapsLat);
+        const lng = Number(cfg.event.mapsLng);
+        const hasCoords = Number.isFinite(lat) && Number.isFinite(lng);
+        if (hasCoords) {
+          // q=lat,lng biasanya menampilkan pin pada koordinat tsb
+          // z= zoom (semakin besar semakin dekat). 16-18 umumnya pas.
+          embedUrl = `https://www.google.com/maps?q=${lat},${lng}&z=17&output=embed`;
         } else {
-          embedUrl = "https://www.google.com/maps?q=" + encodeURIComponent(cfg.event.venueName) + "&output=embed";
+          // Shortlink (maps.app.goo.gl) tidak bisa langsung di-embed reliably.
+          // Gunakan fallback query agar iframe selalu tampil.
+          const isShort = /maps\.app\.goo\.gl|goo\.gl\/maps/i.test(mapsUrl);
+
+          if (!isShort && (mapsUrl.includes("google.com/maps") || mapsUrl.includes("maps.google"))) {
+            const u = new URL(mapsUrl);
+            u.searchParams.set("output", "embed");
+            embedUrl = u.toString();
+          } else {
+            embedUrl = "https://www.google.com/maps?q=" + encodeURIComponent(qText) + "&output=embed";
+          }
         }
+
         embed.src = embedUrl;
       } catch {
         $("#mapEmbedWrap").style.display = "none";
@@ -1400,7 +1575,7 @@
       });
     }
 
-    // ========== RSVP storage ==========
+    // ========== RSVP storage (local fallback) ==========
     const RSVP_KEY = "wedding_rsvp_v2";
 
     function loadRsvps(){
@@ -1409,6 +1584,95 @@
 
     function saveRsvps(items){
       localStorage.setItem(RSVP_KEY, JSON.stringify(items));
+    }
+
+    // ========== Firebase Realtime Database (Ucapan Terakhir) ==========
+    let fbApp = null;
+    let fbDb = null;
+    let fbRsvpRef = null;
+    let fbUnsubscribe = null;
+
+    function initFirebase(){
+      const fbcfg = cfg?.firebase;
+      if (!fbcfg?.enabled) return false;
+
+      try {
+        if (!window.firebase?.initializeApp || !window.firebase?.database) {
+          console.warn('Firebase SDK not loaded');
+          return false;
+        }
+
+        // Gunakan named app agar tidak bentrok jika ada firebase app lain di halaman
+        const APP_NAME = 'weddingInviteApp';
+        try {
+          fbApp = window.firebase.app(APP_NAME);
+        } catch {
+          fbApp = window.firebase.initializeApp(fbcfg.config, APP_NAME);
+        }
+
+        // Compat app memiliki method database()
+        fbDb = fbApp.database();
+
+        const path = String(fbcfg.rsvpPath || 'rsvpMessages').replace(/^\/+/, '');
+        fbRsvpRef = fbDb.ref(path);
+        return true;
+      } catch (e) {
+        console.warn('Firebase init failed:', e);
+        fbApp = null;
+        fbDb = null;
+        fbRsvpRef = null;
+        return false;
+      }
+    }
+
+    async function pushRsvpToFirebase(payload){
+      if (!fbRsvpRef) throw new Error('Firebase not ready');
+      // Push a new message
+      const ref = fbRsvpRef.push();
+      await ref.set(payload);
+      return ref.key;
+    }
+
+    function stopFirebaseListener(){
+      if (typeof fbUnsubscribe === 'function') {
+        try { fbUnsubscribe(); } catch {}
+      }
+      fbUnsubscribe = null;
+    }
+
+    function startFirebaseRsvpListener(){
+      if (!fbRsvpRef) return;
+      stopFirebaseListener();
+
+      const limit = Math.max(1, Math.min(50, Number(cfg?.firebase?.listLimit || 10)));
+      // Pakai atMs agar urutan konsisten lintas timezone/perangkat
+      const q = fbRsvpRef.orderByChild('atMs').limitToLast(limit);
+
+      const normalizeAtMs = (v) => {
+        // server timestamp biasanya sudah number saat diterima client.
+        // Tapi tetap jaga-jaga jika ada string / value lain.
+        if (typeof v === 'number' && Number.isFinite(v)) return v;
+        const n = Number(v);
+        return Number.isFinite(n) ? n : 0;
+      };
+
+      const handler = (snap) => {
+        const val = snap.val() || {};
+        const items = Object.keys(val).map((k) => ({ id: k, ...val[k], atMs: normalizeAtMs(val[k]?.atMs) }));
+
+        // Sort terbaru -> terlama (pakai atMs jika ada)
+        items.sort((a,b) => {
+          const ta = (typeof a.atMs === 'number' && Number.isFinite(a.atMs)) ? a.atMs : (Number(a.atMs) || new Date(a.at || 0).getTime());
+          const tb = (typeof b.atMs === 'number' && Number.isFinite(b.atMs)) ? b.atMs : (Number(b.atMs) || new Date(b.at || 0).getTime());
+          return tb - ta;
+        });
+
+        lastFirebaseItems = items;
+        renderRsvpListFrom(items, { mode: 'firebase' });
+      };
+
+      q.on('value', handler);
+      fbUnsubscribe = () => q.off('value', handler);
     }
 
     function escapeHtml(s) {
@@ -1421,54 +1685,193 @@
       }[c]));
     }
 
-    function badgeClass(attend){
+    // ===== Optimistic RSVP state (langsung tampil sebelum Firebase update) =====
+    const pendingRsvps = new Map();
+    let lastFirebaseItems = []; // cache snapshot terbaru dari Firebase untuk render instan
+    
+    // Pagination state
+    let rsvpCurrentPage = 1;
+    let rsvpPerPage = 5; // jumlah ucapan per halaman (default 5)
+
+    function makeClientId(){
+      try {
+        return `${Date.now()}_${Math.random().toString(16).slice(2)}_${Math.random().toString(16).slice(2)}`;
+      } catch {
+        return String(Date.now());
+      }
+    }
+
+    function badgeClass(attend, status){
+      if (status === 'pending') return "badge-pending";
+      if (status === 'sent') return "badge-sent";
+      if (status === 'offline') return "badge-offline";
       if (attend === "Hadir") return "badge-hadir";
       if (attend === "Tidak Hadir") return "badge-tidak";
       return "badge-ragu";
     }
 
-    function renderRsvpList(){
-      const items = loadRsvps();
+    function mergePendingWithServer(serverItems){
+      const list = Array.isArray(serverItems) ? serverItems.slice() : [];
+
+      // Track which clientIds already exist on server
+      const serverClientIds = new Set();
+      list.forEach(it => {
+        if (it && it.clientId) serverClientIds.add(String(it.clientId));
+      });
+
+      // If server already has an item, remove its pending copy
+      for (const [cid, pending] of pendingRsvps.entries()) {
+        if (serverClientIds.has(cid)) {
+          pendingRsvps.delete(cid);
+        }
+      }
+
+      // Add remaining pending to the top
+      const pendingArr = Array.from(pendingRsvps.values());
+      pendingArr.sort((a,b) => (b.atMs || 0) - (a.atMs || 0));
+
+      return [...pendingArr, ...list];
+    }
+
+    function renderRsvpListFrom(items, opts = {}){
       const wrap = $("#rsvpList");
+      const paginationWrap = $("#rsvpPagination");
+      const pageInfo = $("#rsvpPageInfo");
+      const prevBtn = $("#rsvpPrevBtn");
+      const nextBtn = $("#rsvpNextBtn");
+      const perPageSelect = $("#rsvpPerPage");
       wrap.innerHTML = "";
 
-      if (!items.length){
+      const mode = String(opts.mode || 'local');
+      const baseList = Array.isArray(items) ? items : [];
+      const list = (mode === 'firebase') ? mergePendingWithServer(baseList) : baseList;
+
+      if (!list.length){
         const empty = document.createElement("div");
         empty.className = "rsvp-item";
-        empty.textContent = "Belum ada RSVP yang tersimpan di perangkat ini.";
+        empty.textContent = cfg?.firebase?.enabled
+          ? "Belum ada ucapan yang masuk."
+          : "Belum ada RSVP yang tersimpan di perangkat ini.";
         wrap.appendChild(empty);
+        if (paginationWrap) paginationWrap.style.display = "none";
         return;
       }
 
-      items.slice(0, 10).forEach((it) => {
+      // Pagination calculation
+      const totalItems = list.length;
+      const totalPages = Math.ceil(totalItems / rsvpPerPage);
+      
+      // Pastikan currentPage valid
+      if (rsvpCurrentPage > totalPages) rsvpCurrentPage = totalPages;
+      if (rsvpCurrentPage < 1) rsvpCurrentPage = 1;
+      
+      const startIdx = (rsvpCurrentPage - 1) * rsvpPerPage;
+      const endIdx = Math.min(startIdx + rsvpPerPage, totalItems);
+      const itemsToShow = list.slice(startIdx, endIdx);
+
+      itemsToShow.forEach((it) => {
         const row = document.createElement("div");
         row.className = "rsvp-item";
-        const when = new Date(it.at).toLocaleString("id-ID");
+
+        const status = String(it.status || '');
+        const when = new Date(it.at || Date.now()).toLocaleString("id-ID");
+        const metaLead = status === 'pending'
+          ? 'Mengirim…'
+          : (status === 'sent' ? 'Terkirim' : (status === 'offline' ? 'Offline' : escapeHtml(it.attend)));
+
+        const badgeText = status === 'pending'
+          ? 'Mengirim…'
+          : (status === 'sent' ? 'Terkirim' : (status === 'offline' ? 'Offline' : it.attend));
+
         row.innerHTML = `
           <div class="top">
             <div>
               <div class="name">${escapeHtml(it.name)}</div>
-              <div class="meta">${escapeHtml(it.attend)} • ${escapeHtml(String(it.count || 1))} tamu • ${escapeHtml(when)}</div>
+              <div class="meta">${metaLead} • ${escapeHtml(String(it.count || 1))} tamu • ${escapeHtml(when)}</div>
             </div>
-            <div class="badge ${badgeClass(it.attend)}">${escapeHtml(it.attend)}</div>
+            <div class="badge ${badgeClass(it.attend, status)}">${escapeHtml(badgeText)}</div>
           </div>
-          ${it.msg ? `<div class="msg">${escapeHtml(it.msg)}</div>` : `<div class="msg" style="opacity:.7;">(Tanpa pesan)</div>`}
+          ${(String(it.msg || "").trim()) ? `<div class="msg">${escapeHtml(it.msg)}</div>` : `<div class="msg" style="opacity:.7;">(Tanpa pesan)</div>`}
         `;
         wrap.appendChild(row);
       });
+
+      // Update pagination controls
+      if (paginationWrap && totalItems > 0) {
+        paginationWrap.style.display = "flex";
+        
+        // Update page info
+        if (pageInfo) {
+          pageInfo.textContent = `Halaman ${rsvpCurrentPage} dari ${totalPages} (${totalItems} ucapan)`;
+        }
+        
+        // Update button states
+        if (prevBtn) {
+          prevBtn.disabled = rsvpCurrentPage <= 1;
+        }
+        if (nextBtn) {
+          nextBtn.disabled = rsvpCurrentPage >= totalPages;
+        }
+        
+        // Sync dropdown value
+        if (perPageSelect && perPageSelect.value !== String(rsvpPerPage)) {
+          perPageSelect.value = String(rsvpPerPage);
+        }
+      } else if (paginationWrap) {
+        paginationWrap.style.display = "none";
+      }
+    }
+
+    function renderRsvpList(){
+      // local fallback (dipakai bila Firebase non-aktif / gagal)
+      renderRsvpListFrom(loadRsvps());
     }
 
     function initRsvp(){
       const form = $("#rsvpForm");
       const notice = $("#rsvpNotice");
 
+      // Render awal dari local (fallback), lalu jika Firebase aktif -> live data
       renderRsvpList();
+      const firebaseReady = initFirebase();
+      if (firebaseReady) {
+        startFirebaseRsvpListener();
 
-      form.addEventListener("submit", (e) => {
+        // Optional diagnostics in debug mode
+        const u = new URL(window.location.href);
+        const dbg = (u.searchParams.get('debug') === '1' || u.searchParams.get('debug') === 'true');
+        if (dbg) {
+          toast('Firebase siap: listener Ucapan Terakhir aktif');
+          // quick read test (non-blocking)
+          try {
+            fbRsvpRef.limitToLast(1).once('value')
+              .then(() => console.log('[debug] Firebase read OK'))
+              .catch((e) => console.warn('[debug] Firebase read failed:', e));
+          } catch (e) {
+            console.warn('[debug] Firebase read test error:', e);
+          }
+        }
+      }
+
+      // Tombol submit: tampilkan status mengirim (biar user yakin data sedang diproses)
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const submitSpan = submitBtn ? submitBtn.querySelector('span') : null;
+      const submitDefaultText = submitSpan ? submitSpan.textContent : 'Kirim Konfirmasi';
+      const setSubmitting = (on) => {
+        if (!submitBtn) return;
+        submitBtn.disabled = !!on;
+        submitBtn.style.opacity = on ? '0.75' : '1';
+        submitBtn.style.cursor = on ? 'not-allowed' : 'pointer';
+        if (submitSpan) submitSpan.textContent = on ? 'MENGIRIM…' : submitDefaultText;
+      };
+
+      form.addEventListener("submit", async (e) => {
         e.preventDefault();
+
         const name = $("#rsvpName").value.trim();
         const attend = $("#rsvpAttend").value;
-        const count = Math.min(5, Math.max(1, Number($("#rsvpCount").value || "1")));
+        const countRaw = parseInt($("#rsvpCount").value || "1", 10);
+        const count = Math.min(5, Math.max(1, Number.isFinite(countRaw) ? countRaw : 1));
         const msg = $("#rsvpMsg").value.trim();
 
         if (!name || !attend) {
@@ -1476,43 +1879,205 @@
           return;
         }
 
-        const items = loadRsvps();
-        items.unshift({ name, attend, count, msg, at: new Date().toISOString() });
-        saveRsvps(items);
+        setSubmitting(true);
 
-        notice.style.display = "block";
-        notice.textContent = "Terima kasih! RSVP Anda tersimpan di perangkat ini.";
-        toast("RSVP terkirim");
+        try {
+          const clientId = makeClientId();
+          const base = { name, attend, count, msg: msg || "", clientId };
 
-        $("#rsvpMsg").value = "";
-        renderRsvpList();
+          // OPTIMISTIC UI: langsung tampilkan di "Ucapan Terakhir" sebagai pending
+          const pendingItem = {
+            ...base,
+            at: new Date().toISOString(),
+            atMs: Date.now(),
+            status: 'pending'
+          };
+          pendingRsvps.set(clientId, pendingItem);
+
+          // Anti-stuck: jika terlalu lama tidak terkirim, ubah status jadi offline
+          setTimeout(() => {
+            const cur = pendingRsvps.get(clientId);
+            if (cur && cur.status === 'pending') {
+              pendingRsvps.set(clientId, { ...cur, status: 'offline' });
+              if (fbRsvpRef) {
+                renderRsvpListFrom(lastFirebaseItems, { mode: 'firebase' });
+              } else {
+                renderRsvpListFrom([pendingRsvps.get(clientId), ...loadRsvps()], { mode: 'local' });
+              }
+            }
+          }, 12000);
+
+          // Render cepat: tampilkan pending + data firebase terakhir (jika ada)
+          if (fbRsvpRef) {
+            renderRsvpListFrom(lastFirebaseItems, { mode: 'firebase' });
+          } else {
+            renderRsvpListFrom([pendingItem, ...loadRsvps()], { mode: 'local' });
+          }
+
+          // Selalu simpan local sebagai fallback offline
+          const payloadLocal = {
+            ...base,
+            at: new Date().toISOString(),
+            atMs: Date.now(),
+            to: parseGuestName() || "",
+            ua: navigator.userAgent
+          };
+          try {
+            const local = loadRsvps();
+            local.unshift(payloadLocal);
+            saveRsvps(local);
+          } catch {}
+
+          // Pastikan Firebase siap (kalau belum siap saat init, coba init ulang saat submit)
+          let firebaseOk = !!fbRsvpRef;
+          if (!firebaseOk && cfg?.firebase?.enabled) {
+            firebaseOk = initFirebase();
+            if (firebaseOk) startFirebaseRsvpListener();
+          }
+
+          // Kirim ke Firebase (online)
+          let sentOnline = false;
+          let onlineFailReason = '';
+
+          // payload untuk Firebase (tambahkan timestamp server bila tersedia)
+          const payloadFirebase = {
+            ...base,
+            at: new Date().toISOString(),
+            atMs: (window.firebase?.database?.ServerValue?.TIMESTAMP) || Date.now(),
+            to: parseGuestName() || "",
+            ua: navigator.userAgent
+          };
+
+          if (firebaseOk && fbRsvpRef) {
+            try {
+              await pushRsvpToFirebase(payloadFirebase);
+              sentOnline = true;
+
+              // Update pending item status -> sent (akan hilang saat listener Firebase menerima item yg sama via clientId)
+              const cur = pendingRsvps.get(clientId);
+              if (cur) {
+                pendingRsvps.set(clientId, { ...cur, status: 'sent' });
+              }
+              renderRsvpListFrom(lastFirebaseItems, { mode: 'firebase' });
+            } catch (err) {
+              console.warn('Failed to push RSVP to Firebase:', err);
+              const emsg = (err && (err.code || err.message)) ? String(err.code || err.message) : '';
+
+              if (/permission_denied/i.test(emsg)) {
+                onlineFailReason = 'permission_denied';
+              } else if (!navigator.onLine) {
+                onlineFailReason = 'offline';
+              } else {
+                onlineFailReason = 'unknown';
+              }
+
+              // Update pending item status -> offline
+              const cur = pendingRsvps.get(clientId);
+              if (cur) {
+                pendingRsvps.set(clientId, { ...cur, status: 'offline' });
+              }
+              // Render ulang supaya user tahu statusnya berubah
+              if (fbRsvpRef) renderRsvpListFrom(lastFirebaseItems, { mode: 'firebase' });
+            }
+          } else {
+            onlineFailReason = cfg?.firebase?.enabled ? 'not_ready' : 'disabled';
+
+            // Update pending item status -> offline/not_ready
+            const cur = pendingRsvps.get(clientId);
+            if (cur) {
+              pendingRsvps.set(clientId, { ...cur, status: 'offline' });
+            }
+            if (fbRsvpRef) renderRsvpListFrom(lastFirebaseItems, { mode: 'firebase' });
+          }
+
+          // Feedback UI
+          notice.style.display = "block";
+          if (sentOnline) {
+            notice.textContent = "Terima kasih! Konfirmasi & ucapan Anda sudah tersimpan.";
+            toast("Pesan Terkirim..");
+          } else {
+            // Tetap tersimpan lokal sebagai fallback
+            if (onlineFailReason === 'permission_denied') {
+              notice.textContent = "Konfirmasi tersimpan di perangkat ini (offline). Server menolak akses (permission denied).";
+              toast("Server menolak akses (permission denied)");
+              // Hint untuk admin saat debug
+              try {
+                const u = new URL(window.location.href);
+                const dbg = (u.searchParams.get('debug') === '1' || u.searchParams.get('debug') === 'true');
+                if (dbg) {
+                  console.warn('[debug] Periksa Realtime Database Rules: pastikan read/write untuk path', cfg?.firebase?.rsvpPath);
+                }
+              } catch {}
+            } else if (onlineFailReason === 'offline') {
+              notice.textContent = "Kamu sedang offline. Konfirmasi tersimpan di perangkat ini dan bisa dikirim ulang saat online.";
+              toast("Kamu sedang offline");
+            } else if (onlineFailReason === 'not_ready') {
+              notice.textContent = "Konfirmasi tersimpan di perangkat ini (offline). Firebase belum siap/terblokir.";
+              toast("Firebase belum siap");
+            } else {
+              notice.textContent = "Terima kasih! Data tersimpan di perangkat ini (offline).";
+              toast("RSVP tersimpan offline");
+            }
+          }
+
+          // Reset field selain nama (biar cepat kirim lagi)
+          $("#rsvpAttend").value = "";
+          $("#rsvpCount").value = "1";
+          $("#rsvpMsg").value = "";
+
+          // Jika Firebase tidak aktif, list pakai local.
+          // Jika Firebase aktif, biarkan listener Firebase + pending UI yang mengatur list.
+          if (!firebaseOk) renderRsvpList();
+        } finally {
+          setSubmitting(false);
+        }
       });
 
-      $("#clearRsvp").addEventListener("click", () => {
-        if (!confirm("Reset semua RSVP yang tersimpan di perangkat ini?")) return;
-        saveRsvps([]);
-        renderRsvpList();
-        toast("RSVP direset");
-      });
+      // Event listeners untuk pagination
+      const prevBtn = $("#rsvpPrevBtn");
+      const nextBtn = $("#rsvpNextBtn");
+      const perPageSelect = $("#rsvpPerPage");
+      
+      if (prevBtn) {
+        prevBtn.addEventListener("click", () => {
+          if (rsvpCurrentPage > 1) {
+            rsvpCurrentPage--;
+            if (fbRsvpRef) {
+              renderRsvpListFrom(lastFirebaseItems, { mode: 'firebase' });
+            } else {
+              renderRsvpList();
+            }
+          }
+        });
+      }
+      
+      if (nextBtn) {
+        nextBtn.addEventListener("click", () => {
+          const totalItems = lastFirebaseItems.length + pendingRsvps.size;
+          const totalPages = Math.ceil(totalItems / rsvpPerPage);
+          if (rsvpCurrentPage < totalPages) {
+            rsvpCurrentPage++;
+            if (fbRsvpRef) {
+              renderRsvpListFrom(lastFirebaseItems, { mode: 'firebase' });
+            } else {
+              renderRsvpList();
+            }
+          }
+        });
+      }
+      
+      if (perPageSelect) {
+        perPageSelect.addEventListener("change", () => {
+          rsvpPerPage = parseInt(perPageSelect.value, 10) || 5;
+          rsvpCurrentPage = 1; // Reset ke halaman pertama
+          if (fbRsvpRef) {
+            renderRsvpListFrom(lastFirebaseItems, { mode: 'firebase' });
+          } else {
+            renderRsvpList();
+          }
+        });
+      }
 
-      $("#exportRsvp").addEventListener("click", () => {
-        const items = loadRsvps();
-        if (!items.length) return toast("Tidak ada data untuk diexport");
-
-        const header = ["name","attend","count","msg","at"].join(",");
-        const rows = items.map(it => [csvCell(it.name), csvCell(it.attend), csvCell(it.count), csvCell(it.msg), csvCell(it.at)].join(","));
-        const csv = [header, ...rows].join("\n");
-
-        const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "rsvp.csv";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-      });
     }
 
     function csvCell(v){
@@ -1523,6 +2088,14 @@
     // ========== Fade in on scroll ==========
     function initFadeIn(){
       const faders = document.querySelectorAll('.fade-in-section');
+
+      // Fallback untuk browser/embedded webview tertentu yang tidak mendukung IntersectionObserver.
+      // Tanpa fallback ini, section akan tetap opacity:0 (terlihat "hilang") di sebagian perangkat HP.
+      if (!('IntersectionObserver' in window)) {
+        faders.forEach(el => el.classList.add('is-visible'));
+        return;
+      }
+
       const appearOptions = { threshold: 0.15, rootMargin: "0px 0px -50px 0px" };
       const appearOnScroll = new IntersectionObserver(function(entries) {
         entries.forEach(entry => {
@@ -1857,6 +2430,3 @@
   </script>
 </body>
 </html>
-
-
-
